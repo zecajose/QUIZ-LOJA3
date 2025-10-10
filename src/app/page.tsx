@@ -67,6 +67,7 @@ export default function Home() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [showDiagnostic, setShowDiagnostic] = useState(false)
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     try {
@@ -291,6 +292,35 @@ export default function Home() {
   const currentQuestion = questions[currentStep] as any
   const progress = ((currentStep + 1) / questions.length) * 100
 
+  // 🔗 ENVIO PARA O MAKE (WEBHOOK)
+  const sendFormData = async () => {
+    if (sending) return
+    setSending(true)
+    try {
+      const health = calcHealthScore()
+      const payload = {
+        ...formData,
+        completionPercent,
+        healthScore: health.pct,
+        healthLabel: health.label,
+        submittedAt: new Date().toISOString()
+      }
+
+      await fetch('https://hook.us2.make.com/ape5oo85bbbeiiwd9tuyt483ij27ge8d', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      alert('Pronto! Suas respostas foram enviadas. Em breve você receberá o diagnóstico completo. ✅')
+    } catch (e) {
+      console.error(e)
+      alert('Ops! Não consegui enviar agora. Tente novamente em instantes.')
+    } finally {
+      setSending(false)
+    }
+  }
+
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealthScore()
@@ -376,8 +406,12 @@ export default function Home() {
             </div>
 
             <div className="text-center space-y-4">
-              <button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto">
-                Acessar Diagnóstico Completo
+              <button
+                onClick={sendFormData}
+                disabled={sending}
+                className={`bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto ${sending ? 'opacity-70 cursor-not-allowed' : 'hover:from-pink-600 hover:to-purple-700'}`}
+              >
+                {sending ? 'Enviando…' : 'Acessar Diagnóstico Completo'}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
               <p className="text-sm text-gray-500">
