@@ -69,6 +69,7 @@ export default function Home() {
   const [showDiagnostic, setShowDiagnostic] = useState(false)
   const [sending, setSending] = useState(false)
 
+  // carregar do localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem('fashionStoreForm')
@@ -85,6 +86,7 @@ export default function Home() {
     }
   }, [])
 
+  // salvar no localStorage
   useEffect(() => {
     const payload = { ...formData, __version: FORM_VERSION }
     localStorage.setItem('fashionStoreForm', JSON.stringify(payload))
@@ -292,7 +294,7 @@ export default function Home() {
   const currentQuestion = questions[currentStep] as any
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // 🔗 ENVIO PARA O MAKE (WEBHOOK)
+  // 🔗 ENVIO PARA O BACKEND (rota /api/webhook → Make)
   const sendFormData = async () => {
     if (sending) return
     setSending(true)
@@ -306,11 +308,18 @@ export default function Home() {
         submittedAt: new Date().toISOString()
       }
 
-      await fetch('https://hook.us2.make.com/ape5oo85bbbeiiwd9tuyt483ij27ge8d', {
+      const res = await fetch('/api/webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
+
+      const out = await res.json()
+      if (!res.ok || !out.ok) {
+        console.error('Erro ao enviar', out)
+        alert('Ops! Não consegui enviar agora. Tente novamente.')
+        return
+      }
 
       alert('Pronto! Suas respostas foram enviadas. Em breve você receberá o diagnóstico completo. ✅')
     } catch (e) {
@@ -468,94 +477,93 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="space-y-4">
-            {questions[currentStep].type === 'text' && (
-              <input
-                type="text"
-                placeholder={(questions[currentStep] as any).placeholder}
-                value={formData[questions[currentStep].id as keyof FormData] as string}
-                onChange={(e) => updateFormData(questions[currentStep].id as keyof FormData, e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none text-lg"
-              />
-            )}
+        <div className="space-y-4">
+          {questions[currentStep].type === 'text' && (
+            <input
+              type="text"
+              placeholder={(questions[currentStep] as any).placeholder}
+              value={formData[questions[currentStep].id as keyof FormData] as string}
+              onChange={(e) => updateFormData(questions[currentStep].id as keyof FormData, e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none text-lg"
+            />
+          )}
 
-            {questions[currentStep].type === 'select' && (
-              <div className="space-y-3">
-                {(questions[currentStep] as any).options?.map((option: string) => (
+          {questions[currentStep].type === 'select' && (
+            <div className="space-y-3">
+              {(questions[currentStep] as any).options?.map((option: string) => (
+                <button
+                  key={option}
+                  onClick={() => updateFormData(questions[currentStep].id as keyof FormData, option)}
+                  className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${(
+                    formData as any
+                  )[questions[currentStep].id] === option
+                    ? 'border-pink-500 bg-pink-50 text-pink-700'
+                    : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {questions[currentStep].type === 'multiple' && (
+            <div className="space-y-3">
+              {(questions[currentStep] as any).options?.map((option: string) => {
+                const isSelected = ((formData as any)[questions[currentStep].id] as string[]).includes(option)
+                return (
                   <button
                     key={option}
-                    onClick={() => updateFormData(questions[currentStep].id as keyof FormData, option)}
-                    className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${(
-                      formData as any
-                    )[questions[currentStep].id] === option
+                    onClick={() => toggleArrayValue(questions[currentStep].id as keyof FormData, option)}
+                    className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${isSelected
                       ? 'border-pink-500 bg-pink-50 text-pink-700'
                       : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
                     }`}
                   >
-                    {option}
+                    <div className="flex items-center justify-between">
+                      {option}
+                      {isSelected && <CheckCircle className="w-5 h-5 text-pink-500" />}
+                    </div>
                   </button>
-                ))}
-              </div>
-            )}
-
-            {questions[currentStep].type === 'multiple' && (
-              <div className="space-y-3">
-                {(questions[currentStep] as any).options?.map((option: string) => {
-                  const isSelected = ((formData as any)[questions[currentStep].id] as string[]).includes(option)
-                  return (
-                    <button
-                      key={option}
-                      onClick={() => toggleArrayValue(questions[currentStep].id as keyof FormData, option)}
-                      className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${isSelected
-                        ? 'border-pink-500 bg-pink-50 text-pink-700'
-                        : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        {option}
-                        {isSelected && <CheckCircle className="w-5 h-5 text-pink-500" />}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </div>
+      </div>
 
-        <div className="flex justify-between">
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 0}
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${currentStep === 0
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
-            }`}
-          >
-            <ChevronLeft className="w-5 h-5 mr-2" />
-            Anterior
-          </button>
+      <div className="flex justify-between">
+        <button
+          onClick={prevStep}
+          disabled={currentStep === 0}
+          className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${currentStep === 0
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
+          }`}
+        >
+          <ChevronLeft className="w-5 h-5 mr-2" />
+          Anterior
+        </button>
 
-          <button
-            onClick={nextStep}
-            disabled={
-              (questions[currentStep].type === 'text' && !(formData as any)[questions[currentStep].id]) ||
-              (questions[currentStep].type === 'select' && !(formData as any)[questions[currentStep].id]) ||
-              (questions[currentStep].type === 'multiple' && ((formData as any)[questions[currentStep].id] as string[]).length === 0)
-            }
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${(
-              (questions[currentStep].type === 'text' && !(formData as any)[questions[currentStep].id]) ||
-              (questions[currentStep].type === 'select' && !(formData as any)[questions[currentStep].id]) ||
-              (questions[currentStep].type === 'multiple' && ((formData as any)[questions[currentStep].id] as string[]).length === 0)
-            )
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 shadow-lg'
-            }`}
-          >
-            {currentStep === questions.length - 1 ? 'Ver Diagnóstico' : 'Próxima'}
-            <ChevronRight className="w-5 h-5 ml-2" />
-          </button>
-        </div>
+        <button
+          onClick={nextStep}
+          disabled={
+            (questions[currentStep].type === 'text' && !(formData as any)[questions[currentStep].id]) ||
+            (questions[currentStep].type === 'select' && !(formData as any)[questions[currentStep].id]) ||
+            (questions[currentStep].type === 'multiple' && ((formData as any)[questions[currentStep].id] as string[]).length === 0)
+          }
+          className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${(
+            (questions[currentStep].type === 'text' && !(formData as any)[questions[currentStep].id]) ||
+            (questions[currentStep].type === 'select' && !(formData as any)[questions[currentStep].id]) ||
+            (questions[currentStep].type === 'multiple' && ((formData as any)[questions[currentStep].id] as string[]).length === 0)
+          )
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 shadow-lg'
+          }`}
+        >
+          {currentStep === questions.length - 1 ? 'Ver Diagnóstico' : 'Próxima'}
+          <ChevronRight className="w-5 h-5 ml-2" />
+        </button>
       </div>
     </div>
   )
