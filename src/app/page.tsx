@@ -255,8 +255,8 @@ export default function Page() {
                 <img src={NIVEIS.iniciante} alt="Loja iniciante de rua, pouca estrutura e baixo movimento" className="h-full w-full object-cover" />
               </div>
               <div className="mt-3 space-y-1 text-center text-sm">
-                <p className="font-extrabold text-gray-800">Faturamento: R$ 1.000/mês</p>
-                <p className="text-gray-600">Fachada simples, pouco movimento, presença digital fraca.</p>
+                <p className="font-extrabold text-gray-800">Loja pouco estruturada:</p>
+                <p className="text-gray-600">Baixo Faturamento, poucos clientes, presença digital fraca.</p>
               </div>
             </CardBox>
 
@@ -266,7 +266,10 @@ export default function Page() {
               <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
                 <img src={NIVEIS.seuNivel} alt="Lojista preocupada com contas, presa no operacional" className="h-full w-full object-cover" />
               </div>
-              <p className="mt-3 text-center text-sm text-neutral-600">Pronto para descobrir seu nível e o plano de ação ideal para crescer?</p>
+              <div className="mt-3 space-y-1 text-center text-sm">
+                <p className="font-extrabold text-gray-800">Sua Loja</p>
+                <p className="text-gray-600">Carecendo de melhorias no digital, poucos clientes com recompra, sem controle total da loja.</p>
+              </div>
             </CardBox>
 
             {/* Reconhecimento nacional */}
@@ -279,8 +282,8 @@ export default function Page() {
                 <img src={NIVEIS.nacional} alt="Fachada de loja de moda em shopping, vitrine impecável" className="h-full w-full object-cover" />
               </div>
               <div className="mt-3 space-y-1 text-center text-sm">
-                <p className="font-extrabold text-gray-800">Brasil</p>
-                <p className="text-gray-600">Presença em diversas regiões do país e destaque no mercado nacional.</p>
+                <p className="font-extrabold text-gray-800">Empresária Madura</p>
+                <p className="text-gray-600">Loja com calendario editorial completo, utiliza as redes sociais para converter, possui recompra de seus clientes e sabe exatamente o que fazer.</p>
               </div>
             </CardBox>
           </section>
