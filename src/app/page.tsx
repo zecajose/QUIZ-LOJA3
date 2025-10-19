@@ -66,6 +66,23 @@ const questions: Question[] = [
 /** mapeia id->tipo para validar preenchimento e cálculo de % */
 const fieldsConfig: { key: keyof FormData; type: QType }[] = questions.map(q => ({ key: q.id, type: q.type } as any))
 
+// ===== Imagens do /public =====
+const NIVEIS = {
+  iniciante: '/images/niveis/lojinha-iniciante.jpg',
+  seuNivel: '/images/niveis/seu-nivel-preocupada.jpg',
+  nacional: '/images/niveis/loja-shopping.jpg'
+} as const
+
+// Resultados/Avatares (remotos por enquanto)
+const REMOTO = {
+  vit1: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1600&auto=format&fit=crop',
+  vit2: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop',
+  vit3: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1600&auto=format&fit=crop',
+  ava1: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop',
+  ava2: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop',
+  ava3: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=200&auto=format&fit=crop',
+} as const
+
 export default function Page() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -186,7 +203,7 @@ export default function Page() {
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // ---------- Tela de diagnóstico ----------
+  // ---------- Página final (após o quiz) ----------
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealth()
@@ -194,41 +211,86 @@ export default function Page() {
     const blurred = diagnostics.slice(visible.length)
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-            <div className="text-center mb-8">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Diagnóstico Parcial Concluído!</h1>
-              <p className="text-gray-600">Aqui está uma prévia da análise da sua loja</p>
-            </div>
+      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
+        <div className="mx-auto w-full max-w-6xl">
+          {/* HERO */}
+          <header className="mb-10 text-center">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">
+              Desbloqueie o diagnóstico completo da sua loja
+            </h1>
+            <p className="mx-auto mt-3 max-w-3xl text-sm md:text-base text-gray-600">
+              Veja seu nível no mercado de moda, entenda o que está travando seu crescimento e receba um caminho claro para vender mais.
+            </p>
+          </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="p-5 rounded-xl border bg-gray-50">
-                <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
-                <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
-                  <span>Progresso</span><span>{completionPercent}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
-                </div>
+          {/* Cards: % e Saúde */}
+          <section className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-8">
+            <div className="p-5 rounded-xl border bg-white shadow-sm">
+              <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
+              <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
+                <span>Progresso</span><span>{completionPercent}%</span>
               </div>
-
-              <div className="p-5 rounded-xl border bg-gray-50">
-                <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
-                <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
-                  <span>Status</span>
-                  <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className={`h-2 rounded-full ${health.bar}`} style={{ width: `${health.pct}%` }} />
-                </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
               </div>
             </div>
+            <div className="p-5 rounded-xl border bg-white shadow-sm">
+              <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
+              <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
+                <span>Status</span>
+                <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className={`h-2 rounded-full ${health.bar}`} style={{ width: `${health.pct}%` }} />
+              </div>
+            </div>
+          </section>
 
-            <div className="space-y-4 mb-8">
+          {/* COMPARATIVO: Nível da Loja */}
+          <section className="grid gap-4 md:grid-cols-3">
+            {/* Lojinha Iniciante */}
+            <CardBox>
+              <div className="mb-2 text-center"><Badge>Lojinha iniciante</Badge></div>
+              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img src={NIVEIS.iniciante} alt="Loja iniciante de rua, pouca estrutura e baixo movimento" className="h-full w-full object-cover" />
+              </div>
+              <div className="mt-3 space-y-1 text-center text-sm">
+                <p className="font-extrabold text-gray-800">Faturamento: R$ 1.000/mês</p>
+                <p className="text-gray-600">Fachada simples, pouco movimento, presença digital fraca.</p>
+              </div>
+            </CardBox>
+
+            {/* Seu nível */}
+            <CardBox extra="ring-2 ring-indigo-400">
+              <div className="mb-2 text-center"><Badge>Seu nível</Badge></div>
+              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img src={NIVEIS.seuNivel} alt="Lojista preocupada com contas, presa no operacional" className="h-full w-full object-cover" />
+              </div>
+              <p className="mt-3 text-center text-sm text-neutral-600">Pronto para descobrir seu nível e o plano de ação ideal para crescer?</p>
+            </CardBox>
+
+            {/* Reconhecimento nacional */}
+            <CardBox>
+              <div className="mb-2 flex items-center justify-center gap-2">
+                <Badge>Reconhecimento nacional</Badge>
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">Referência</span>
+              </div>
+              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img src={NIVEIS.nacional} alt="Fachada de loja de moda em shopping, vitrine impecável" className="h-full w-full object-cover" />
+              </div>
+              <div className="mt-3 space-y-1 text-center text-sm">
+                <p className="font-extrabold text-gray-800">Brasil</p>
+                <p className="text-gray-600">Presença em diversas regiões do país e destaque no mercado nacional.</p>
+              </div>
+            </CardBox>
+          </section>
+
+          {/* DIAGNÓSTICO (parte visível + parte borrada) */}
+          <section className="mt-10">
+            <SectionTitle overline="Prévia" title="Uma amostra do seu diagnóstico" />
+            <div className="space-y-4 mb-6">
               {visible.map((d, i) => (
-                <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color}`}>
+                <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color} bg-white shadow-sm`}>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">{d.area}</h3>
                     <span className="text-sm font-medium px-2 py-1 rounded-full bg-white">{d.status}</span>
@@ -241,7 +303,7 @@ export default function Page() {
                 <div className="relative">
                   <div className="space-y-4 filter blur-sm select-none pointer-events-none">
                     {blurred.map((d, i) => (
-                      <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color}`}>
+                      <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color} bg-white shadow-sm`}>
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold">{d.area}</h3>
                           <span className="text-sm font-medium px-2 py-1 rounded-full bg-white">{d.status}</span>
@@ -251,7 +313,7 @@ export default function Page() {
                     ))}
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/80 backdrop-blur-sm border rounded-xl px-4 py-3 text-center shadow">
+                    <div className="bg-white/85 backdrop-blur-sm border rounded-xl px-4 py-3 text-center shadow">
                       <p className="font-semibold text-gray-800">Parte do diagnóstico está oculta</p>
                       <p className="text-sm text-gray-600">Desbloqueie o conteúdo completo e o plano de 90 dias</p>
                     </div>
@@ -259,19 +321,37 @@ export default function Page() {
                 </div>
               )}
             </div>
+          </section>
 
-            <div className="text-center space-y-4">
-              <button
-                onClick={sendFormData}
-                disabled={sending}
-                className={`bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg mx-auto flex items-center justify-center ${sending ? 'opacity-70 cursor-not-allowed' : 'hover:from-pink-600 hover:to-purple-700'}`}
-              >
-                {sending ? 'Enviando…' : 'Acessar Diagnóstico Completo'}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-              <p className="text-sm text-gray-500">Investimento único de R$ 17,90 • Acesso imediato • Garantia de 7 dias</p>
-              <button onClick={() => { setShowDiagnostic(false); setCurrentStep(0) }} className="text-gray-500 hover:text-gray-700 text-sm underline">Voltar ao formulário</button>
-            </div>
+          {/* PLANOS */}
+          <PricingSection onClickCTA={sendFormData} sending={sending} />
+
+          {/* BENEFÍCIOS */}
+          <BenefitsSection />
+
+          {/* RELATÓRIO BLOQUEADO (com BLUR) */}
+          <ReportSection onClickCTA={sendFormData} sending={sending} />
+
+          {/* RESULTADOS REAIS */}
+          <ResultsSection vit1={REMOTO.vit1} vit2={REMOTO.vit2} vit3={REMOTO.vit3} />
+
+          {/* DEPOIMENTOS */}
+          <TestimonialsSection ava1={REMOTO.ava1} ava2={REMOTO.ava2} ava3={REMOTO.ava3} />
+
+          {/* FAQ */}
+          <FAQSection />
+
+          {/* CTA Final */}
+          <FinalCTA onClickCTA={sendFormData} sending={sending} />
+
+          {/* Voltar */}
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => { setShowDiagnostic(false); setCurrentStep(0) }}
+              className="text-gray-500 hover:text-gray-700 text-sm underline"
+            >
+              Voltar ao formulário
+            </button>
           </div>
         </div>
       </div>
@@ -388,5 +468,279 @@ export default function Page() {
         </div>
       </div>
     </div>
+  )
+}
+
+/* ===================== COMPONENTES AUXILIARES ===================== */
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-black tracking-wide text-indigo-700">
+      {children}
+    </span>
+  )
+}
+
+function CardBox({ children, extra = '' }: { children: React.ReactNode; extra?: string }) {
+  return <article className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 ${extra}`}>{children}</article>
+}
+
+function SectionTitle({ overline, title }: { overline?: string; title: string }) {
+  return (
+    <div className="mb-6 text-center">
+      {overline && <div className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600">{overline}</div>}
+      <h2 className="text-2xl md:text-4xl font-black tracking-tight text-gray-900">{title}</h2>
+    </div>
+  )
+}
+
+function PricingSection({ onClickCTA, sending }: { onClickCTA: () => void; sending: boolean }) {
+  return (
+    <section className="mt-14">
+      <SectionTitle overline="Oferta" title="Escolha seu acesso ao diagnóstico completo" />
+      <div className="grid items-stretch gap-5 md:grid-cols-3">
+        <PriceCard
+          title="Plano 1"
+          price="R$ 14,90"
+          sub="PAGAMENTO ÚNICO"
+          bullets={['Análise da sua loja', 'Checklist de prioridade (curto prazo)']}
+          onClickCTA={onClickCTA}
+          sending={sending}
+        />
+        <PriceCard
+          ribbon="Mais vendido"
+          highlight
+          title="Plano 2"
+          price="R$ 19,90"
+          sub="PAGAMENTO ÚNICO"
+          bullets={['Análise da sua loja', 'Direcionamento de melhorias', 'Sugestões de conteúdo e ofertas']}
+          onClickCTA={onClickCTA}
+          sending={sending}
+        />
+        <PriceCard
+          ribbon="Recomendado"
+          title="Plano 3"
+          price="R$ 27,90"
+          sub="PAGAMENTO ÚNICO"
+          bullets={[
+            'Análise da loja',
+            'Direcionamento de melhorias',
+            'Relatório personalizado para a sua loja',
+            'Manual de bolso de um perfil campeão (conteúdo, funil e vendas)',
+          ]}
+          onClickCTA={onClickCTA}
+          sending={sending}
+        />
+      </div>
+    </section>
+  )
+}
+
+function PriceCard({
+  title, price, sub, bullets, ribbon, highlight = false, onClickCTA, sending
+}: {
+  title: string; price: string; sub: string; bullets: string[]; ribbon?: string; highlight?: boolean;
+  onClickCTA: () => void; sending: boolean;
+}) {
+  return (
+    <div className={[
+      'relative flex h-full flex-col rounded-2xl bg-white text-center shadow-sm ring-1 ring-black/5 transition',
+      highlight ? 'ring-2 ring-indigo-400' : '',
+    ].join(' ')}>
+      {ribbon && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-sm">{ribbon}</div>
+      )}
+      <div className="px-6 pt-8">
+        <h3 className="text-lg font-extrabold text-gray-900">{title}</h3>
+        <div className="mt-3 text-4xl font-black leading-none text-gray-900">{price}</div>
+        <div className="mt-1 text-[12px] uppercase tracking-wide text-neutral-500">{sub}</div>
+      </div>
+      <div className="mx-8 mt-5 min-h-[160px] flex-1">
+        <ul className="space-y-2 text-left text-sm text-neutral-700">
+          {bullets.map((b, i) => (
+            <li key={i} className="flex items-start gap-2"><span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-neutral-700" /><span>{b}</span></li>
+          ))}
+        </ul>
+      </div>
+      <div className="px-6 pb-7 pt-4">
+        <button
+          onClick={onClickCTA}
+          disabled={sending}
+          className={`mx-auto inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:translate-y-[-1px] hover:bg-indigo-700 hover:shadow-[0_7px_0_#3730a3] active:translate-y-[1px] active:shadow-[0_5px_0_#3730a3] ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
+        >
+          {sending ? 'Enviando…' : 'Desbloquear meu diagnóstico'}
+        </button>
+        <p className="mt-2 text-center text-[11px] text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
+      </div>
+    </div>
+  )
+}
+
+function BenefitsSection() {
+  const items = [
+    { icon: '📊', title: 'Diagnóstico detalhado', desc: 'Raio-X do seu negócio: presença digital, funil, oferta e retenção.' },
+    { icon: '🗺️', title: 'Plano de 90 dias', desc: 'Tarefas semanais e metas mensais focadas em crescimento real.' },
+    { icon: '📱', title: 'Análise de redes sociais', desc: 'Recomendações de conteúdo, calendário e formatos que convertem.' },
+    { icon: '🛍️', title: 'Estratégias de venda', desc: 'Ofertas, kits, ticket médio e campanhas sazonais.' },
+    { icon: '🔁', title: 'Fidelização e recorrência', desc: 'Pós-venda, cupons, fluxo de WhatsApp e reativação de clientes.' },
+    { icon: '📈', title: 'Métricas essenciais', desc: 'Acompanhe CAC, ROI, taxa de recompra e conversão por canal.' },
+  ]
+  return (
+    <section className="mt-14">
+      <SectionTitle overline="Benefícios" title="O que você recebe ao desbloquear" />
+      <div className="grid gap-4 md:grid-cols-2">
+        {items.map((it, i) => (
+          <FeatureItem key={i} icon={it.icon} title={it.title} desc={it.desc} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function FeatureItem({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+      <div className="grid h-10 w-10 place-items-center rounded-lg bg-pink-50 text-lg">{icon}</div>
+      <div>
+        <div className="font-extrabold text-gray-900">{title}</div>
+        <div className="text-sm text-neutral-600">{desc}</div>
+      </div>
+    </div>
+  )
+}
+
+function ReportSection({ onClickCTA, sending }: { onClickCTA: () => void; sending: boolean }) {
+  return (
+    <section className="mt-14">
+      <SectionTitle overline="Seu relatório" title="Relatório personalizado para a sua loja" />
+      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+        <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">
+          Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento.
+          Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.
+        </p>
+
+        {/* Fundo borrado simulando conteúdo oculto */}
+        <div className="relative mt-6 overflow-hidden rounded-xl">
+          <div className="h-56 w-full bg-gradient-to-r from-purple-100 via-pink-100 to-indigo-100 blur-md" />
+          <div className="absolute inset-0 grid place-items-center">
+            <div className="rounded-xl bg-white/90 px-6 py-5 text-center shadow">
+              <div className="text-3xl mb-1">🔒</div>
+              <div className="font-semibold text-gray-800">Você precisa de acesso completo para ler o relatório</div>
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-4 text-center text-[11px] text-neutral-500">
+          Disponível imediatamente após a confirmação do pagamento.
+        </p>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={onClickCTA}
+            disabled={sending}
+            className={`inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-4 text-lg font-extrabold text-white shadow-[0_8px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[2px] active:shadow-[0_6px_0_#3730a3] ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            {sending ? 'Enviando…' : 'Desbloquear meu diagnóstico'}
+          </button>
+          <p className="mt-2 text-xs text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ResultsSection({ vit1, vit2, vit3 }: { vit1: string; vit2: string; vit3: string }) {
+  return (
+    <section className="mt-14">
+      <SectionTitle overline="Resultados reais" title="Lojistas que destravaram o crescimento" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <RealResultCard img={vit1} nome="Carla, Boutique Luma" texto="Em 30 dias, passei a postar 3x por semana com CTA e o WhatsApp virou meu melhor canal. Vendi 2x mais kits." />
+        <RealResultCard img={vit2} nome="Gabi, Dona G Modas" texto="Organizei ofertas por coleção e aumentei o ticket médio com combos. O plano deu clareza total." />
+        <RealResultCard img={vit3} nome="Isa, Clube da Saia" texto="Fluxo de pós-compra e reativação trouxe clientes de volta. ROI dos anúncios subiu com criativo alinhado." />
+      </div>
+    </section>
+  )
+}
+
+function RealResultCard({ img, nome, texto }: { img: string; nome: string; texto: string }) {
+  return (
+    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+      <div className="h-36 w-full overflow-hidden rounded-xl bg-neutral-100">
+        <img src={img} alt={nome} className="h-full w-full object-cover" />
+      </div>
+      <div className="mt-3 text-sm">
+        <div className="font-semibold text-gray-900">{nome}</div>
+        <p className="text-neutral-700">{texto}</p>
+      </div>
+    </div>
+  )
+}
+
+function TestimonialsSection({ ava1, ava2, ava3 }: { ava1: string; ava2: string; ava3: string }) {
+  return (
+    <section className="mt-14">
+      <SectionTitle overline="Avaliações" title="O que lojistas estão dizendo" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <Testimonial img={ava1} nome="Paula" tag="VERIFICADO" texto="Finalmente parei de tentar de tudo e foquei no que funciona. Em 45 dias, bati minha melhor semana do ano." />
+        <Testimonial img={ava2} nome="Renata" tag="VERIFICADO" texto="As tarefas semanais me ajudaram a sair da inércia. Meus stories agora geram pedidos no mesmo dia." />
+        <Testimonial img={ava3} nome="Larissa" tag="VERIFICADO" texto="Eu não tinha estratégia. O diagnóstico mostrou o caminho e o relatório personalizado vale cada centavo." />
+      </div>
+    </section>
+  )
+}
+
+function Testimonial({ img, nome, tag, texto }: { img: string; nome: string; tag: string; texto: string }) {
+  return (
+    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+      <div className="mb-2 flex items-center gap-2 text-sm">
+        <div className="h-9 w-9 overflow-hidden rounded-full bg-neutral-200"><img src={img} alt={nome} className="h-full w-full object-cover" /></div>
+        <div className="font-semibold">{nome}</div>
+        <span className="ml-auto rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">{tag}</span>
+      </div>
+      <div className="text-neutral-700">{texto}</div>
+    </div>
+  )
+}
+
+function FAQSection() {
+  const items = [
+    { q: 'Serve para lojas pequenas?', a: 'Sim. Foi desenhado para quem fatura pouco e precisa de passos práticos, simples e mensuráveis.' },
+    { q: 'Quando recebo o relatório?', a: 'Logo após a confirmação do pagamento, você recebe o PDF e o plano de 90 dias no e-mail/WhatsApp.' },
+    { q: 'Preciso ter site?', a: 'Não. O plano cobre Instagram/WhatsApp e sugere quando faz sentido evoluir para um site ou catálogo.' },
+    { q: 'É assinatura?', a: 'Não. É pagamento único, sem cobrança recorrente.' },
+  ]
+  return (
+    <section className="mt-14">
+      <SectionTitle overline="FAQ" title="Dúvidas frequentes" />
+      <div className="grid gap-3">
+        {items.map((it, i) => (<FAQ key={i} q={it.q} a={it.a} />))}
+      </div>
+    </section>
+  )
+}
+
+function FAQ({ q, a }: { q: string; a: string }) {
+  return (
+    <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-black/5">
+      <details>
+        <summary className="cursor-pointer list-none text-left font-semibold text-gray-900">{q}</summary>
+        <p className="mt-2 text-sm text-neutral-600">{a}</p>
+      </details>
+    </div>
+  )
+}
+
+function FinalCTA({ onClickCTA, sending }: { onClickCTA: () => void; sending: boolean }) {
+  return (
+    <section className="mt-14 text-center">
+      <button
+        onClick={onClickCTA}
+        disabled={sending}
+        className={`inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-4 text-lg font-extrabold text-white shadow-[0_8px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[2px] active:shadow-[0_6px_0_#3730a3] ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
+      >
+        {sending ? 'Enviando…' : 'Desbloquear meu diagnóstico'}
+      </button>
+      <p className="mt-2 text-xs text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
+    </section>
   )
 }
