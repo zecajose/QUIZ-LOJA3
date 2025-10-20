@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   ChevronRight, ChevronLeft, Store, Instagram, Phone, Calendar, ShoppingBag, Users,
-  MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Globe, Mail, CheckCircle, ArrowRight
+  MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Globe, Mail, CheckCircle, ArrowRight, Loader2
 } from 'lucide-react'
 
 /** Versão do schema salvo no localStorage */
-const FORM_VERSION = '1.0.0'
+const FORM_VERSION = '2.0.0'
 
-type QType = 'text' | 'select' | 'multiple'
+type QType = 'text' | 'select' | 'multiple' | 'loading'
 
 interface FormData {
   nome: string; whatsapp: string; instagram: string; tempoMercado: string; canaisVenda: string[];
@@ -28,21 +28,33 @@ const initialFormData: FormData = {
   analiseConcorrencia: '', metricas: '', estrategiaConteudo: ''
 }
 
+/** ===== Imagens do /public ===== */
+const NIVEIS = {
+  iniciante: '/images/niveis/lojinha-iniciante.jpg',
+  seuNivel: '/images/niveis/seu-nivel-preocupada.jpg',
+  nacional: '/images/niveis/loja-shopping.jpg'
+} as const
+
+/** ===== Perguntas + Telas de Carregamento ===== */
 type Question =
   | { id: keyof FormData; title: string; icon: JSX.Element; type: 'text'; placeholder: string }
   | { id: keyof FormData; title: string; icon: JSX.Element; type: 'select'; options: string[] }
   | { id: keyof FormData; title: string; icon: JSX.Element; type: 'multiple'; options: string[] }
+  | { id: string; type: 'loading'; title: string; subtitle: string; duration: number; finalStep?: boolean }
 
 const questions: Question[] = [
-  { id: 'nome', title: 'Qual o nome da sua loja?', icon: <Store className="w-6 h-6" />, type: 'text', placeholder: 'Digite o nome da sua loja' },
-  { id: 'whatsapp', title: 'Qual seu WhatsApp para contato?', icon: <Phone className="w-6 h-6" />, type: 'text', placeholder: '(11) 99999-9999' },
+  { id: 'nome', title: 'Qual o nome da sua Loja?', icon: <Store className="w-6 h-6" />, type: 'text', placeholder: 'Digite o nome da sua loja' },
+  { id: 'whatsapp', title: 'Qual o seu WhatsApp para enviar o Diagnóstico?', icon: <Phone className="w-6 h-6" />, type: 'text', placeholder: '(11) 99999-9999' },
   { id: 'instagram', title: 'Qual o Instagram da sua loja?', icon: <Instagram className="w-6 h-6" />, type: 'text', placeholder: '@sualojaaqui' },
 
-  { id: 'tempoMercado', title: 'Há quanto tempo sua loja está no mercado?', icon: <Calendar className="w-6 h-6" />, type: 'select', options: ['Menos de 6 meses','6 meses a 1 ano','1 a 2 anos','2 a 5 anos','Mais de 5 anos'] },
+  { id: 'tempoMercado', title: 'Há quanto tempo a sua loja existe?', icon: <Calendar className="w-6 h-6" />, type: 'select', options: ['Menos de 6 meses','6 meses a 1 ano','1 a 2 anos','2 a 5 anos','Mais de 5 anos'] },
   { id: 'canaisVenda', title: 'Quais canais de venda você utiliza?', icon: <ShoppingBag className="w-6 h-6" />, type: 'multiple', options: ['Loja física','Instagram','WhatsApp','Site próprio','Marketplace (Mercado Livre, Shopee)','Facebook','Outros'] },
   { id: 'estiloPecas', title: 'Qual o estilo predominante das suas peças?', icon: <Users className="w-6 h-6" />, type: 'select', options: ['Casual','Elegante/Social','Jovem/Moderno','Plus Size','Moda Praia','Íntimo/Lingerie','Esportivo','Boho/Alternativo'] },
   { id: 'perfilPublico', title: 'Qual o perfil do seu público-alvo?', icon: <Users className="w-6 h-6" />, type: 'select', options: ['Jovens (18-25 anos)','Adultas (26-35 anos)','Maduras (36-50 anos)','Todas as idades','Classe A/B','Classe C','Classe C/D'] },
   { id: 'comunicacaoMarca', title: 'Como você descreveria a comunicação da sua marca?', icon: <MessageCircle className="w-6 h-6" />, type: 'select', options: ['Descontraída e jovem','Elegante e sofisticada','Próxima e amigável','Profissional','Ainda estou definindo'] },
+
+  { id: 'scan1', type: 'loading', title: 'Analisando sua loja...', subtitle: 'Identificando presença digital e comportamento da marca', duration: 6000 },
+
   { id: 'faturamento', title: 'Qual o faturamento mensal aproximado da sua loja?', icon: <DollarSign className="w-6 h-6" />, type: 'select', options: ['Até R$ 5.000','R$ 5.001 a R$ 15.000','R$ 15.001 a R$ 30.000','R$ 30.001 a R$ 50.000','Acima de R$ 50.000'] },
   { id: 'ticketMedio', title: 'Qual o ticket médio das suas vendas?', icon: <DollarSign className="w-6 h-6" />, type: 'select', options: ['Até R$ 50','R$ 51 a R$ 100','R$ 101 a R$ 200','R$ 201 a R$ 300','Acima de R$ 300'] },
   { id: 'produtoMaisVendido', title: 'Qual categoria de produto mais vende na sua loja?', icon: <TrendingUp className="w-6 h-6" />, type: 'text', placeholder: 'Ex: Vestidos, Blusas, Calças, etc.' },
@@ -51,28 +63,57 @@ const questions: Question[] = [
   { id: 'presencaDigital', title: 'Onde sua marca está presente digitalmente?', icon: <Smartphone className="w-6 h-6" />, type: 'multiple', options: ['Instagram','Facebook','WhatsApp Business','Site próprio','Google Meu Negócio','TikTok','Pinterest','Nenhum'] },
   { id: 'frequenciaPostagens', title: 'Com que frequência você posta nas redes sociais?', icon: <Instagram className="w-6 h-6" />, type: 'select', options: ['Diariamente','3-4 vezes por semana','1-2 vezes por semana','Esporadicamente','Não posto regularmente'] },
   { id: 'investimentoAnuncios', title: 'Você investe em anúncios pagos?', icon: <DollarSign className="w-6 h-6" />, type: 'select', options: ['Sim, regularmente','Sim, esporadicamente','Já tentei, mas parei','Nunca investi','Pretendo começar'] },
-  { id: 'temSite', title: 'Sua loja tem site próprio?', icon: <Globe className="w-6 h-6" />, type: 'select', options: ['Sim, com loja virtual','Sim, apenas institucional','Não, mas pretendo ter','Não vejo necessidade'] },
   { id: 'vendasRedesSociais', title: 'Que % das suas vendas vem das redes sociais?', icon: <TrendingUp className="w-6 h-6" />, type: 'select', options: ['Menos de 20%','20% a 40%','40% a 60%','60% a 80%','Mais de 80%'] },
+
+  { id: 'scan2', type: 'loading', title: 'Criando o planejamento ideal para sua loja...', subtitle: 'Usando suas respostas para montar o plano perfeito', duration: 8000 },
+
   { id: 'contatoPosCompra', title: 'Como você mantém contato com clientes após a compra?', icon: <Mail className="w-6 h-6" />, type: 'select', options: ['WhatsApp','Instagram','E-mail','SMS','Não mantenho contato regular'] },
   { id: 'objetivosFuturos', title: 'Quais são seus objetivos para os próximos 12 meses?', icon: <Target className="w-6 h-6" />, type: 'multiple', options: ['Aumentar faturamento','Expandir para novos canais','Melhorar presença digital','Abrir loja física','Lançar site/e-commerce','Profissionalizar gestão','Aumentar equipe'] },
   { id: 'diferencial', title: 'Como você se diferencia das outras lojas?', icon: <Target className="w-6 h-6" />, type: 'select', options: ['Preço mais acessível','Qualidade superior','Atendimento personalizado','Exclusividade das peças','Ainda não tenho um diferencial claro'] },
   { id: 'planejamentoColecao', title: 'Você planeja coleções sazonais?', icon: <Calendar className="w-6 h-6" />, type: 'select', options: ['Sim, com antecedência','Sim, mas sem estrutura','Não, compro conforme demanda','Não faço coleções sazonais'] },
   { id: 'retencao', title: 'Você tem ações para estimular a recompra?', icon: <CheckCircle className="w-6 h-6" />, type: 'select', options: ['Programa de fidelidade','Cupons de desconto','Pós-venda personalizado','Não tenho nenhuma ação'] },
   { id: 'analiseConcorrencia', title: 'Com que frequência analisa concorrentes/tendências?', icon: <TrendingUp className="w-6 h-6" />, type: 'select', options: ['Semanalmente','Mensalmente','Raramente','Nunca'] },
-  { id: 'metricas', title: 'Você acompanha CAC, ROI ou taxa de recompra?', icon: <DollarSign className="w-6 h-6" />, type: 'select', options: ['Sim, frequentemente','Sim, mas com dificuldade','Raramente','Não acompanho'] },
-  { id: 'estrategiaConteudo', title: 'Seu conteúdo é pensado para conversão?', icon: <MessageCircle className="w-6 h-6" />, type: 'select', options: ['Estratégico para vendas','Misto: institucional e promoções','Mais institucional','Não tenho estratégia'] }
+  { id: 'metricas', title: 'Você acompanha Custo de aquisição de clientes (CAC), Retorno sobre o investimento (ROI) ou taxa de recompra?', icon: <DollarSign className="w-6 h-6" />, type: 'select', options: ['Sim, frequentemente','Sim, mas com dificuldade','Raramente','Não acompanho'] },
+  { id: 'estrategiaConteudo', title: 'Seu conteúdo é pensado para conversão?', icon: <MessageCircle className="w-6 h-6" />, type: 'select', options: ['Estratégico para vendas','Misto: institucional e promoções','Mais institucional','Não tenho estratégia'] },
+
+  { id: 'scan3', type: 'loading', title: 'Gerando seu diagnóstico personalizado...', subtitle: 'Consolidando todas as informações da sua loja', duration: 6000, finalStep: true },
 ]
 
-/** mapeia id->tipo para validar preenchimento e cálculo de % */
-const fieldsConfig: { key: keyof FormData; type: QType }[] = questions.map(q => ({ key: q.id, type: q.type } as any))
+/** mapeia id->tipo para validar preenchimento e cálculo de % (exclui as telas loading) */
+const fieldsConfig: { key: keyof FormData; type: Exclude<QType,'loading'> }[] =
+  (questions.filter(q => q.type !== 'loading') as any[]).map(q => ({ key: q.id, type: q.type }))
 
-/** ===== Imagens do /public ===== */
-const NIVEIS = {
-  iniciante: '/images/niveis/lojinha-iniciante.jpg',
-  seuNivel: '/images/niveis/seu-nivel-preocupada.jpg',
-  nacional: '/images/niveis/loja-shopping.jpg'
-} as const
+/** ---------- Component de carregamento ---------- */
+function AnalyzingScreen({ title, subtitle, duration, onFinish }: { title: string; subtitle: string; duration: number; onFinish: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onFinish, duration)
+    return () => clearTimeout(t)
+  }, [duration, onFinish])
 
+  return (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-5">
+      <div className="relative h-28 w-28">
+        <div className="absolute inset-0 rounded-full border-4 border-pink-200" />
+        <div className="absolute inset-0 rounded-full border-4 border-t-pink-500 animate-spin" />
+        <Loader2 className="absolute inset-0 m-auto h-8 w-8 text-pink-600 animate-pulse" />
+      </div>
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-800">{title}</h2>
+      <p className="text-gray-600">{subtitle}</p>
+      <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2 bg-gradient-to-r from-pink-500 to-purple-600 animate-[loadingbar_1.4s_ease_infinite]" />
+      </div>
+      <style jsx>{`
+        @keyframes loadingbar {
+          0% { transform: translateX(-100%); width: 40%; }
+          50% { transform: translateX(20%); width: 60%; }
+          100% { transform: translateX(100%); width: 40%; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+/** ---------- Página ---------- */
 export default function Page() {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -101,7 +142,7 @@ export default function Page() {
     updateFormData(field, arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value])
   }
 
-  // % respondido
+  // % respondido (considera só perguntas não-loading)
   const answeredCount = useMemo(() => {
     return fieldsConfig.reduce((acc, f) => {
       const v = formData[f.key] as any
@@ -142,31 +183,20 @@ export default function Page() {
 
   const generateDiagnostic = () => {
     const out: { area: string; status: string; message: string; color: string }[] = []
-
-    if (formData.presencaDigital.length <= 2)
-      out.push({ area:'Presença Digital', status:'Crítico', message:'Sua presença digital é limitada. Expanda canais como Google Meu Negócio, TikTok e WhatsApp Business.', color:'text-red-600 bg-red-50' })
-    else if (formData.presencaDigital.length <= 4)
-      out.push({ area:'Presença Digital', status:'Atenção', message:'Boa presença, mas ainda há espaço para novos canais e parcerias.', color:'text-yellow-600 bg-yellow-50' })
-    else
-      out.push({ area:'Presença Digital', status:'Excelente', message:'Diversificação saudável — foque agora em frequência e conversão.', color:'text-green-600 bg-green-50' })
+    if (formData.presencaDigital.length <= 2) out.push({ area:'Presença Digital', status:'Crítico', message:'Sua presença digital é limitada. Expanda canais.', color:'text-red-600 bg-red-50' })
+    else if (formData.presencaDigital.length <= 4) out.push({ area:'Presença Digital', status:'Atenção', message:'Há espaço para abrir novos canais.', color:'text-yellow-600 bg-yellow-50' })
+    else out.push({ area:'Presença Digital', status:'Excelente', message:'Presença diversificada. Siga escalando criativos.', color:'text-green-600 bg-green-50' })
 
     if (['Não posto regularmente','Esporadicamente'].includes(formData.frequenciaPostagens))
-      out.push({ area:'Engajamento', status:'Crítico', message:'Consistência semanal é prioridade (3–5x/sem). Use Reels com prova social e CTA.', color:'text-red-600 bg-red-50' })
+      out.push({ area:'Engajamento', status:'Crítico', message:'Consistência de posts é prioridade (3–5x/sem).', color:'text-red-600 bg-red-50' })
     else
-      out.push({ area:'Engajamento', status:'OK', message:'Boa cadência. Inclua ofertas e provas sociais para conversão.', color:'text-green-600 bg-green-50' })
+      out.push({ area:'Engajamento', status:'OK', message:'Boa frequência. Foque em CTAs e prova social.', color:'text-green-600 bg-green-50' })
 
     if (formData.investimentoAnuncios === 'Nunca investi')
-      out.push({ area:'Marketing Pago', status:'Oportunidade', message:'Comece com campanhas simples (engajamento + tráfego para WhatsApp) e teste 3 criativos.', color:'text-blue-600 bg-blue-50' })
-    else if (formData.investimentoAnuncios === 'Já tentei, mas parei')
-      out.push({ area:'Marketing Pago', status:'Atenção', message:'Estruture Pixel, coleções e catálogos. Valide ofertas em A/B quinzenal.', color:'text-yellow-600 bg-yellow-50' })
-    else
-      out.push({ area:'Marketing Pago', status:'Em andamento', message:'Mantenha orçamento estável e renove criativos a cada 15 dias.', color:'text-green-600 bg-green-50' })
+      out.push({ area:'Marketing Pago', status:'Oportunidade', message:'Teste campanhas básicas com orçamento baixo e criativos simples.', color:'text-blue-600 bg-blue-50' })
 
     if (!formData.diferencial || formData.diferencial === 'Ainda não tenho um diferencial claro')
-      out.push({ area:'Posicionamento', status:'Atenção', message:'Defina uma promessa única (ajuste, qualidade, atendimento consultivo, exclusividade).', color:'text-yellow-600 bg-yellow-50' })
-
-    if (formData.retencao === 'Não tenho nenhuma ação')
-      out.push({ area:'Fidelização', status:'Crítico', message:'Implemente cupom pós-primeira compra, lembrete 30 dias e lista VIP no WhatsApp.', color:'text-red-600 bg-red-50' })
+      out.push({ area:'Posicionamento', status:'Atenção', message:'Defina um ponto único (qualidade/ajuste/atendimento consultivo).', color:'text-yellow-600 bg-yellow-50' })
 
     if (formData.desafios.length)
       out.push({ area:'Obstáculos citados', status:'Reportado', message: formData.desafios.join(', '), color:'text-purple-700 bg-purple-50' })
@@ -205,66 +235,64 @@ export default function Page() {
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // ---------- Tela de diagnóstico (EXPANDIDA) ----------
+  // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
+  if (currentQuestion.type === 'loading') {
+    const q = currentQuestion as Extract<Question, {type:'loading'}>
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
+            <p className="text-gray-600">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
+            <div className="mt-4">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Etapa {currentStep + 1} de {questions.length}</span>
+                <span>{Math.round(progress)}% concluído</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <AnalyzingScreen
+              title={q.title}
+              subtitle={q.subtitle}
+              duration={q.duration}
+              onFinish={() => {
+                // se for a última tela de loading, vai direto pro diagnóstico
+                if (q.finalStep) setShowDiagnostic(true)
+                else setCurrentStep(s => Math.min(questions.length - 1, s + 1))
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ---------- Tela de diagnóstico ----------
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealth()
-    const visible = diagnostics.slice(0, Math.max(2, Math.ceil(diagnostics.length * 0.5)))
+    const visible = diagnostics.slice(0, Math.max(1, Math.ceil(diagnostics.length * 0.3)))
     const blurred = diagnostics.slice(visible.length)
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
+        <div className="mx-auto w-full max-w-6xl">
+
           {/* HERO */}
-          <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">Diagnóstico da sua Loja</h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm md:text-base text-gray-600">
-              Prévia completa com seus indicadores e recomendações. Parte do conteúdo fica oculto até o desbloqueio.
-            </p>
-          </div>
+          <header className="mb-10 text-center">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">Desbloqueie o diagnóstico completo da sua loja</h1>
+            <p className="mx-auto mt-3 max-w-3xl text-sm md:text-base text-gray-600">Veja seu nível no mercado de moda, entenda o que está travando seu crescimento e receba um caminho claro para vender mais.</p>
+          </header>
 
-          {/* CARDS DE NÍVEL (com as 3 fotos) */}
-          <section className="grid gap-5 md:grid-cols-3 mb-10">
-            <CardBox>
-              <div className="mb-2 text-center"><Badge>Lojinha iniciante</Badge></div>
-              <div className="h-56 md:h-64 w-full overflow-hidden rounded-xl bg-neutral-100">
-                <img src={NIVEIS.iniciante} alt="Lojinha iniciante" className="h-full w-full object-cover" />
-              </div>
-              <div className="mt-3 text-center text-sm">
-                <p className="font-extrabold text-gray-800">Faturamento: R$ 1.000/mês</p>
-                <p className="text-gray-600">Fachada simples, pouco movimento, presença digital fraca.</p>
-              </div>
-            </CardBox>
-
-            <CardBox extra="ring-2 ring-indigo-400">
-              <div className="mb-2 text-center"><Badge>Seu nível</Badge></div>
-              <div className="h-56 md:h-64 w-full overflow-hidden rounded-xl bg-neutral-100">
-                <img src={NIVEIS.seuNivel} alt="Seu nível (preocupada com contas)" className="h-full w-full object-cover" />
-              </div>
-              <div className="mt-3 text-center text-sm text-neutral-700">
-                Pronto para descobrir seu nível e o plano de ação ideal para crescer?
-              </div>
-            </CardBox>
-
-            <CardBox>
-              <div className="mb-2 flex items-center justify-between">
-                <Badge>Reconhecimento nacional</Badge>
-                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">Referência</span>
-              </div>
-              <div className="h-56 md:h-64 w-full overflow-hidden rounded-xl bg-neutral-100">
-                <img src={NIVEIS.nacional} alt="Fachada de loja de moda em shopping, vitrine impecável" className="h-full w-full object-cover" />
-              </div>
-              <div className="mt-3 text-center text-sm">
-                <p className="font-extrabold text-gray-800">Brasil</p>
-                <p className="text-gray-600">Presença em diversas regiões do país e destaque no mercado nacional.</p>
-              </div>
-            </CardBox>
-          </section>
-
-          {/* KPIs: Progresso + Saúde */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            <div className="p-6 rounded-2xl border bg-white/80 shadow-sm">
-              <h4 className="font-semibold text-gray-800 mb-3">% do Quiz Preenchido</h4>
+          {/* KPIs superiores */}
+          <section className="grid gap-6 md:grid-cols-2 mb-10">
+            <div className="p-5 rounded-xl border bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
               <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
                 <span>Progresso</span><span>{completionPercent}%</span>
               </div>
@@ -272,8 +300,9 @@ export default function Page() {
                 <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
               </div>
             </div>
-            <div className="p-6 rounded-2xl border bg-white/80 shadow-sm">
-              <h4 className="font-semibold text-gray-800 mb-3">Saúde da Loja</h4>
+
+            <div className="p-5 rounded-xl border bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
               <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
                 <span>Status</span>
                 <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
@@ -284,10 +313,43 @@ export default function Page() {
             </div>
           </section>
 
-          {/* Diagnóstico Detalhado (parte visível + parte borrada) */}
-          <section className="space-y-4 mb-10">
+          {/* COMPARATIVO: Nível da Loja */}
+          <section className="grid gap-4 md:grid-cols-3">
+            <CardBox>
+              <div className="mb-2 text-center"><Badge>Lojinha iniciante</Badge></div>
+              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img src={NIVEIS.iniciante} alt="Lojinha iniciante" className="h-full w-full object-cover" />
+              </div>
+              <div className="mt-3 space-y-1 text-center text-sm">
+                <p className="font-extrabold text-gray-800">Faturamento: R$ 1.000/mês</p>
+                <p className="text-gray-600">Fachada simples, pouco movimento, presença digital fraca.</p>
+              </div>
+            </CardBox>
+
+            <CardBox extra="ring-2 ring-indigo-400 text-center">
+              <div className="mb-2"><Badge>Seu nível</Badge></div>
+              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img src={NIVEIS.seuNivel} alt="Seu nível" className="h-full w-full object-cover" />
+              </div>
+              <p className="mt-3 text-sm text-neutral-600">Pronto para descobrir seu nível e o plano de ação ideal para crescer?</p>
+            </CardBox>
+
+            <CardBox>
+              <div className="mb-2 text-center"><Badge>Reconhecimento nacional</Badge></div>
+              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img src={NIVEIS.nacional} alt="Fachada de loja de shopping, vitrine impecável" className="h-full w-full object-cover" />
+              </div>
+              <div className="mt-3 space-y-1 text-center text-sm">
+                <p className="font-extrabold text-gray-800">Brasil</p>
+                <p className="text-gray-600">Presença em diversas regiões e destaque no mercado nacional.</p>
+              </div>
+            </CardBox>
+          </section>
+
+          {/* BLOCO: Amostra do diagnóstico (visível) + parte borrada */}
+          <section className="mt-10 space-y-4">
             {visible.map((d, i) => (
-              <div key={i} className={`p-5 rounded-xl border-l-4 ${d.color} bg-white shadow-sm`}>
+              <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color}`}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">{d.area}</h3>
                   <span className="text-sm font-medium px-2 py-1 rounded-full bg-white">{d.status}</span>
@@ -297,10 +359,10 @@ export default function Page() {
             ))}
 
             {blurred.length > 0 && (
-              <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm border">
-                <div className="p-5 space-y-4 blur-sm select-none pointer-events-none">
+              <div className="relative">
+                <div className="space-y-4 filter blur-sm select-none pointer-events-none">
                   {blurred.map((d, i) => (
-                    <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color} bg-white`}>
+                    <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color}`}>
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold">{d.area}</h3>
                         <span className="text-sm font-medium px-2 py-1 rounded-full bg-white">{d.status}</span>
@@ -310,7 +372,7 @@ export default function Page() {
                   ))}
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-white/90 backdrop-blur-sm border rounded-xl px-4 py-3 text-center shadow">
+                  <div className="bg-white/85 backdrop-blur-sm border rounded-xl px-4 py-3 text-center shadow">
                     <p className="font-semibold text-gray-800">Parte do diagnóstico está oculta</p>
                     <p className="text-sm text-gray-600">Desbloqueie o conteúdo completo e o plano de 90 dias</p>
                   </div>
@@ -319,19 +381,66 @@ export default function Page() {
             )}
           </section>
 
-          {/* Relatório bloqueado com “borrado” */}
-          <section className="mb-10">
-            <h2 className="text-center text-sm font-black uppercase tracking-[0.18em] text-indigo-600 mb-2">Seu relatório</h2>
-            <h3 className="text-center text-2xl md:text-4xl font-black text-gray-900 mb-4">Relatório personalizado para a sua loja</h3>
+          {/* PLANOS */}
+          <section className="mt-14">
+            <SectionTitle overline="Oferta" title="Escolha seu acesso ao diagnóstico completo" />
+            <div className="grid gap-5 md:grid-cols-3 items-stretch">
+              <PriceCard
+                title="Plano 1"
+                price="R$ 14,90"
+                sub="PAGAMENTO ÚNICO"
+                bullets={[
+                  'Análise da sua loja',
+                  'Checklist de prioridade (curto prazo)'
+                ]}
+              />
+              <PriceCard
+                ribbon="Mais vendido"
+                highlight
+                title="Plano 2"
+                price="R$ 19,90"
+                sub="PAGAMENTO ÚNICO"
+                bullets={[
+                  'Análise da sua loja',
+                  'Direcionamento de melhorias',
+                  'Sugestões de conteúdo e ofertas'
+                ]}
+              />
+              <PriceCard
+                ribbon="Recomendado"
+                title="Plano 3"
+                price="R$ 27,90"
+                sub="PAGAMENTO ÚNICO"
+                bullets={[
+                  'Análise da loja',
+                  'Direcionamento de melhorias',
+                  'Relatório personalizado para a sua loja',
+                  'Manual de bolso de um perfil campeão (conteúdo, funil e vendas)'
+                ]}
+              />
+            </div>
+          </section>
 
+          {/* BENEFÍCIOS */}
+          <section className="mt-14">
+            <SectionTitle overline="Benefícios" title="O que você recebe ao desbloquear" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FeatureItem icon="📊" title="Diagnóstico detalhado" desc="Raio-X do seu negócio: presença digital, funil, oferta e retenção." />
+              <FeatureItem icon="🗺️" title="Plano de 90 dias" desc="Tarefas semanais e metas mensais focadas em crescimento real." />
+              <FeatureItem icon="📱" title="Análise de redes sociais" desc="Recomendações de conteúdo, calendário e formatos que convertem." />
+              <FeatureItem icon="🛍️" title="Estratégias de venda" desc="Ofertas, kits, ticket médio e campanhas sazonais (mãe, namorados, etc.)." />
+              <FeatureItem icon="🔁" title="Fidelização e recorrência" desc="Pós-venda, cupons, fluxo de WhatsApp e reativação de clientes." />
+              <FeatureItem icon="📈" title="Métricas essenciais" desc="Acompanhe CAC, ROI, taxa de recompra e conversão por canal." />
+            </div>
+          </section>
+
+          {/* RELATÓRIO BLOQUEADO */}
+          <section className="mt-14">
+            <SectionTitle overline="Seu relatório" title="Relatório personalizado para a sua loja" />
             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-              <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">
-                Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento.
-                Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.
-              </p>
-
-              <div className="relative mt-4 overflow-hidden rounded-2xl">
-                <div className="h-60 w-full bg-gradient-to-r from-neutral-100 to-neutral-200 blur-sm" />
+              <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento. Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.</p>
+              <div className="relative mt-4 overflow-hidden rounded-xl">
+                <div className="h-40 w-full select-none bg-gradient-to-r from-neutral-100 to-neutral-200" />
                 <div className="absolute inset-0 grid place-items-center">
                   <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow">
                     <div className="text-2xl">🔒</div>
@@ -339,37 +448,51 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-
               <p className="mt-2 text-center text-[11px] text-neutral-500">Disponível imediatamente após a confirmação do pagamento.</p>
             </div>
           </section>
 
-          {/* Benefícios */}
-          <section className="mb-10">
-            <SectionTitle overline="Benefícios" title="O que você recebe ao desbloquear" />
+          {/* RESULTADOS REAIS */}
+          <section className="mt-14">
+            <SectionTitle overline="Resultados reais" title="Lojistas que destravaram o crescimento" />
             <div className="grid gap-4 md:grid-cols-3">
-              <FeatureItem icon="📊" title="Diagnóstico detalhado" desc="Raio-X do negócio: presença digital, funil, oferta e retenção." />
-              <FeatureItem icon="🗺️" title="Plano de 90 dias" desc="Tarefas semanais e metas mensais focadas em crescimento real." />
-              <FeatureItem icon="📱" title="Conteúdos que convertem" desc="Roteiros e formatos para Reels/Stories com CTA." />
+              <RealResultCard img="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" nome="Carla, Boutique Luma" texto="Em 30 dias, passei a postar 3x por semana com CTA e o WhatsApp virou meu melhor canal. Vendi 2x mais kits." />
+              <RealResultCard img="https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=800&auto=format&fit=crop" nome="Gabi, Dona G Modas" texto="Organizei ofertas por coleção e aumentei o ticket médio com combos. O plano deu clareza total." />
+              <RealResultCard img="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop" nome="Isa, Clube da Saia" texto="Fluxo de pós-compra e reativação trouxe clientes de volta. ROI dos anúncios subiu com criativo alinhado." />
             </div>
           </section>
 
-          {/* CTA final */}
-          <section className="text-center">
+          {/* DEPOIMENTOS */}
+          <section className="mt-14">
+            <SectionTitle overline="Avaliações" title="O que lojistas estão dizendo" />
+            <div className="grid gap-4 md:grid-cols-3">
+              <Testimonial img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" nome="Paula" tag="VERIFICADO" texto="Finalmente parei de tentar de tudo e foquei no que funciona. Em 45 dias, bati minha melhor semana do ano." />
+              <Testimonial img="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop" nome="Renata" tag="VERIFICADO" texto="As tarefas semanais me ajudaram a sair da inércia. Meus stories agora geram pedidos no mesmo dia." />
+              <Testimonial img="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=200&auto=format&fit=crop" nome="Larissa" tag="VERIFICADO" texto="Eu não tinha estratégia. O diagnóstico mostrou o caminho e o relatório personalizado vale cada centavo." />
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className="mt-14">
+            <SectionTitle overline="FAQ" title="Dúvidas frequentes" />
+            <div className="grid gap-3">
+              <FAQ q="Serve para lojas pequenas?" a="Sim. Foi desenhado para quem fatura pouco e precisa de passos práticos, simples e mensuráveis." />
+              <FAQ q="Quando recebo o relatório?" a="Logo após a confirmação do pagamento, você recebe o PDF e o plano de 90 dias no e-mail/WhatsApp." />
+              <FAQ q="Preciso ter site?" a="Não. O plano cobre Instagram/WhatsApp e sugere quando faz sentido evoluir para um site ou catálogo." />
+              <FAQ q="É assinatura?" a="Não. É pagamento único, sem cobrança recorrente." />
+            </div>
+          </section>
+
+          {/* CTA Final */}
+          <section className="mt-14 text-center">
             <button
               onClick={sendFormData}
               disabled={sending}
               className={`inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-4 text-lg font-extrabold text-white shadow-[0_8px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[2px] active:shadow-[0_6px_0_#3730a3] ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              {sending ? 'Enviando…' : 'Acessar Diagnóstico Completo'} <ArrowRight className="w-5 h-5 ml-2" />
+              {sending ? 'Enviando…' : 'Desbloquear meu diagnóstico'}
             </button>
             <p className="mt-2 text-xs text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
-            <button
-              onClick={() => { setShowDiagnostic(false); setCurrentStep(0) }}
-              className="block mx-auto mt-4 text-sm text-indigo-700 hover:underline"
-            >
-              Voltar ao formulário
-            </button>
           </section>
         </div>
       </div>
@@ -387,7 +510,7 @@ export default function Page() {
 
         <div className="mb-8">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Pergunta {currentStep + 1} de {questions.length}</span>
+            <span>Etapa {currentStep + 1} de {questions.length}</span>
             <span>{Math.round(progress)}% concluído</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
@@ -397,29 +520,29 @@ export default function Page() {
 
         <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
           <div className="flex items-center mb-6">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl text-white mr-4">{currentQuestion.icon}</div>
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-800">{currentQuestion.title}</h2>
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl text-white mr-4">{(currentQuestion as any).icon}</div>
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800">{(currentQuestion as any).title}</h2>
           </div>
 
           <div className="space-y-4">
-            {currentQuestion.type === 'text' && (
+            {(currentQuestion as any).type === 'text' && (
               <input
                 type="text"
                 placeholder={(currentQuestion as any).placeholder}
-                value={formData[currentQuestion.id] as string}
-                onChange={(e) => updateFormData(currentQuestion.id, e.target.value)}
+                value={(formData as any)[(currentQuestion as any).id] as string}
+                onChange={(e) => updateFormData((currentQuestion as any).id, e.target.value)}
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none text-lg"
               />
             )}
 
-            {currentQuestion.type === 'select' && (
+            {(currentQuestion as any).type === 'select' && (
               <div className="space-y-3">
                 {(currentQuestion as any).options.map((opt: string) => (
                   <button
                     key={opt}
-                    onClick={() => updateFormData(currentQuestion.id, opt)}
+                    onClick={() => updateFormData((currentQuestion as any).id, opt)}
                     className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${
-                      (formData as any)[currentQuestion.id] === opt
+                      (formData as any)[(currentQuestion as any).id] === opt
                         ? 'border-pink-500 bg-pink-50 text-pink-700'
                         : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
                     }`}
@@ -430,14 +553,14 @@ export default function Page() {
               </div>
             )}
 
-            {currentQuestion.type === 'multiple' && (
+            {(currentQuestion as any).type === 'multiple' && (
               <div className="space-y-3">
                 {(currentQuestion as any).options.map((opt: string) => {
-                  const selected = ((formData as any)[currentQuestion.id] as string[]).includes(opt)
+                  const selected = ((formData as any)[(currentQuestion as any).id] as string[]).includes(opt)
                   return (
                     <button
                       key={opt}
-                      onClick={() => toggleArrayValue(currentQuestion.id, opt)}
+                      onClick={() => toggleArrayValue((currentQuestion as any).id, opt)}
                       className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${
                         selected ? 'border-pink-500 bg-pink-50 text-pink-700' : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
                       }`}
@@ -468,14 +591,14 @@ export default function Page() {
           <button
             onClick={() => (currentStep < questions.length - 1 ? setCurrentStep(s => s + 1) : setShowDiagnostic(true))}
             disabled={
-              (currentQuestion.type === 'text' && !(formData as any)[currentQuestion.id]) ||
-              (currentQuestion.type === 'select' && !(formData as any)[currentQuestion.id]) ||
-              (currentQuestion.type === 'multiple' && ((formData as any)[currentQuestion.id] as string[]).length === 0)
+              ((currentQuestion as any).type === 'text' && !(formData as any)[(currentQuestion as any).id]) ||
+              ((currentQuestion as any).type === 'select' && !(formData as any)[(currentQuestion as any).id]) ||
+              ((currentQuestion as any).type === 'multiple' && ((formData as any)[(currentQuestion as any).id] as string[]).length === 0)
             }
             className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
-              ((currentQuestion.type === 'text' && !(formData as any)[currentQuestion.id]) ||
-                (currentQuestion.type === 'select' && !(formData as any)[currentQuestion.id]) ||
-                (currentQuestion.type === 'multiple' && ((formData as any)[currentQuestion.id] as string[]).length === 0))
+              (((currentQuestion as any).type === 'text' && !(formData as any)[(currentQuestion as any).id]) ||
+                ((currentQuestion as any).type === 'select' && !(formData as any)[(currentQuestion as any).id]) ||
+                ((currentQuestion as any).type === 'multiple' && ((formData as any)[(currentQuestion as any).id] as string[]).length === 0))
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 : 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 shadow-lg'
             }`}
@@ -489,10 +612,11 @@ export default function Page() {
   )
 }
 
-/* ====== COMPONENTES AUXILIARES ====== */
+/* ===== Components auxiliares (inline) ===== */
 function Badge({ children }: { children: React.ReactNode }) {
   return <span className="inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-black tracking-wide text-indigo-700">{children}</span>
 }
+
 function SectionTitle({ overline, title }: { overline?: string; title: string }) {
   return (
     <div className="mb-6 text-center">
@@ -501,9 +625,37 @@ function SectionTitle({ overline, title }: { overline?: string; title: string })
     </div>
   )
 }
+
 function CardBox({ children, extra = '' }: { children: React.ReactNode; extra?: string }) {
   return <article className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 ${extra}`}>{children}</article>
 }
+
+function PriceCard({ title, price, sub, bullets, ribbon, highlight=false }: { title: string; price: string; sub: string; bullets: string[]; ribbon?: string; highlight?: boolean }) {
+  return (
+    <div className={[ 'relative flex h-full flex-col rounded-2xl bg-white text-center shadow-sm ring-1 ring-black/5 transition', highlight ? 'ring-2 ring-indigo-400' : '' ].join(' ')}>
+      {ribbon && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-sm">{ribbon}</div>
+      )}
+      <div className="px-6 pt-8">
+        <h3 className="text-lg font-extrabold text-gray-900">{title}</h3>
+        <div className="mt-3 text-4xl font-black leading-none text-gray-900">{price}</div>
+        <div className="mt-1 text-[12px] uppercase tracking-wide text-neutral-500">{sub}</div>
+      </div>
+      <div className="mx-8 mt-5 min-h-[160px] flex-1">
+        <ul className="space-y-2 text-left text-sm text-neutral-700">
+          {bullets.map((b, i) => (
+            <li key={i} className="flex items-start gap-2"><span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-neutral-700" /><span>{b}</span></li>
+          ))}
+        </ul>
+      </div>
+      <div className="px-6 pb-7 pt-4">
+        <button className="mx-auto inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:translate-y-[-1px] hover:bg-indigo-700 hover:shadow-[0_7px_0_#3730a3] active:translate-y-[1px] active:shadow-[0_5px_0_#3730a3]">Desbloquear meu diagnóstico</button>
+        <p className="mt-2 text-center text-[11px] text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
+      </div>
+    </div>
+  )
+}
+
 function FeatureItem({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
     <div className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
@@ -512,6 +664,44 @@ function FeatureItem({ icon, title, desc }: { icon: string; title: string; desc:
         <div className="font-extrabold text-gray-900">{title}</div>
         <div className="text-sm text-neutral-600">{desc}</div>
       </div>
+    </div>
+  )
+}
+
+function RealResultCard({ img, nome, texto }: { img: string; nome: string; texto: string }) {
+  return (
+    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+      <div className="h-36 w-full overflow-hidden rounded-xl bg-neutral-100">
+        <img src={img} alt={nome} className="h-full w-full object-cover" />
+      </div>
+      <div className="mt-3 text-sm">
+        <div className="font-semibold text-gray-900">{nome}</div>
+        <p className="text-neutral-700">{texto}</p>
+      </div>
+    </div>
+  )
+}
+
+function Testimonial({ img, nome, tag, texto }: { img: string; nome: string; tag: string; texto: string }) {
+  return (
+    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+      <div className="mb-2 flex items-center gap-2 text-sm">
+        <div className="h-9 w-9 overflow-hidden rounded-full bg-neutral-200"><img src={img} alt={nome} className="h-full w-full object-cover" /></div>
+        <div className="font-semibold">{nome}</div>
+        <span className="ml-auto rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">{tag}</span>
+      </div>
+      <div className="text-neutral-700">{texto}</div>
+    </div>
+  )
+}
+
+function FAQ({ q, a }: { q: string; a: string }) {
+  return (
+    <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-black/5">
+      <details>
+        <summary className="cursor-pointer list-none text-left font-semibold text-gray-900">{q}</summary>
+        <p className="mt-2 text-sm text-neutral-600">{a}</p>
+      </details>
     </div>
   )
 }
