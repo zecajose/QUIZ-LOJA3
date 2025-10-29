@@ -154,32 +154,44 @@ export default function Page() {
 
   // score de saúde
   const calcHealth = () => {
-    let s = 0
-    const pd = formData.presencaDigital.length
-    if (pd >= 5) s += 20; else if (pd >= 3) s += 14; else if (pd >= 1) s += 8
-    if (formData.frequenciaPostagens === 'Diariamente') s += 10
-    else if (formData.frequenciaPostagens === '3-4 vezes por semana') s += 8
-    else if (formData.frequenciaPostagens === '1-2 vezes por semana') s += 5
-    if (formData.investimentoAnuncios === 'Sim, regularmente') s += 10
-    else if (formData.investimentoAnuncios === 'Sim, esporadicamente') s += 6
-    else if (formData.investimentoAnuncios === 'Pretendo começar') s += 3
-    const cv = formData.canaisVenda.length
-    if (cv >= 4) s += 10; else if (cv >= 2) s += 6; else if (cv >= 1) s += 3
-    if (formData.contatoPosCompra && formData.contatoPosCompra !== 'Não mantenho contato regular') s += 8
-    if (formData.metasVendas && formData.metasVendas !== 'Ainda não defini') s += 8
-    if (formData.temSite && !formData.temSite.startsWith('Não')) s += 4
-    if (formData.vendasRedesSociais === '40% a 60%') s += 6
-    else if (['20% a 40%','60% a 80%'].includes(formData.vendasRedesSociais)) s += 4
-    else s += 2
-    if (formData.diferencial && formData.diferencial !== 'Ainda não tenho um diferencial claro') s += 6
-    if (formData.retencao && formData.retencao !== 'Não tenho nenhuma ação') s += 6
-    if (formData.metricas && formData.metricas !== 'Não acompanho') s += 6
-    const pct = Math.max(0, Math.min(100, Math.round((s / 100) * 100)))
-    const label = pct >= 75 ? 'Saudável' : pct >= 50 ? 'Atenção' : 'Crítico'
-    const color = pct >= 75 ? 'text-green-600' : pct >= 50 ? 'text-yellow-600' : 'text-red-600'
-    const bar = pct >= 75 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-    return { pct, label, color, bar }
-  }
+  let s = 0
+  const pd = formData.presencaDigital.length
+  if (pd >= 5) s += 20
+  else if (pd >= 3) s += 14
+  else if (pd >= 1) s += 8
+
+  if (formData.frequenciaPostagens === 'Diariamente') s += 10
+  else if (formData.frequenciaPostagens === '3-4 vezes por semana') s += 8
+  else if (formData.frequenciaPostagens === '1-2 vezes por semana') s += 5
+
+  if (formData.investimentoAnuncios === 'Sim, regularmente') s += 10
+  else if (formData.investimentoAnuncios === 'Sim, esporadicamente') s += 6
+  else if (formData.investimentoAnuncios === 'Pretendo começar') s += 3
+
+  const cv = formData.canaisVenda.length
+  if (cv >= 4) s += 10
+  else if (cv >= 2) s += 6
+  else if (cv >= 1) s += 3
+
+  if (formData.contatoPosCompra && formData.contatoPosCompra !== 'Não mantenho contato regular') s += 8
+  if (formData.metasVendas && formData.metasVendas !== 'Ainda não defini') s += 8
+  if (formData.temSite && !formData.temSite.startsWith('Não')) s += 4
+
+  if (formData.vendasRedesSociais === '40% a 60%') s += 6
+  else if (['20% a 40%','60% a 80%'].includes(formData.vendasRedesSociais)) s += 4
+  else s += 2
+
+  if (formData.diferencial && formData.diferencial !== 'Ainda não tenho um diferencial claro') s += 6
+  if (formData.retencao && formData.retencao !== 'Não tenho nenhuma ação') s += 6
+  if (formData.metricas && formData.metricas !== 'Não acompanho') s += 6
+
+  const pct = Math.max(0, Math.min(100, Math.round((s / 100) * 100)))
+  const label = pct >= 75 ? 'Saudável' : pct >= 50 ? 'Atenção' : 'Crítico'
+  const color = pct >= 75 ? 'text-green-600' : pct >= 50 ? 'text-yellow-600' : 'text-red-600'
+  const bar = pct >= 75 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+  return { pct, label, color, bar }
+}
+
 
   const generateDiagnostic = () => {
     const out: { area: string; status: string; message: string; color: string }[] = []
