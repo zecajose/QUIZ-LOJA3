@@ -235,44 +235,7 @@ export default function Page() {
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
-  if (currentQuestion.type === 'loading') {
-    const q = currentQuestion as Extract<Question, {type:'loading'}>
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-6">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
-            <p className="text-gray-600">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
-            <div className="mt-4">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>Etapa {currentStep + 1} de {questions.length}</span>
-                <span>{Math.round(progress)}% concluído</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <AnalyzingScreen
-              title={q.title}
-              subtitle={q.subtitle}
-              duration={q.duration}
-              onFinish={() => {
-                // se for a última tela de loading, vai direto pro diagnóstico
-                if (q.finalStep) setShowDiagnostic(true)
-                else setCurrentStep(s => Math.min(questions.length - 1, s + 1))
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ---------- Tela de diagnóstico ----------
+  // ---------- FIX 1: Priorizar o diagnóstico para evitar "loading infinito" ----------
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealth()
@@ -282,7 +245,6 @@ export default function Page() {
     return (
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
         <div className="mx-auto w-full max-w-6xl">
-
           {/* HERO */}
           <header className="mb-10 text-center">
             <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">Desbloqueie o diagnóstico completo da sua loja</h1>
@@ -494,6 +456,46 @@ export default function Page() {
             </button>
             <p className="mt-2 text-xs text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
           </section>
+        </div>
+      </div>
+    )
+  }
+
+  // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
+  if (currentQuestion.type === 'loading') {
+    const q = currentQuestion as Extract<Question, {type:'loading'}>
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
+            <p className="text-gray-600">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
+            <div className="mt-4">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Etapa {currentStep + 1} de {questions.length}</span>
+                <span>{Math.round(progress)}% concluído</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <AnalyzingScreen
+              title={q.title}
+              subtitle={q.subtitle}
+              duration={q.duration}
+              onFinish={() => {
+                // FIX 2: se for a última tela de loading, ativa diagnóstico e "salta" a etapa de loading
+                if (q.finalStep) {
+                  setShowDiagnostic(true)
+                } else {
+                  setCurrentStep(s => Math.min(questions.length - 1, s + 1))
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     )
