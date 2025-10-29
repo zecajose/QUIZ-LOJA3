@@ -99,7 +99,7 @@ function AnalyzingScreen({ title, subtitle, duration, onFinish }: { title: strin
       </div>
       <h2 className="text-2xl md:text-3xl font-bold text-gray-800">{title}</h2>
       <p className="text-gray-600">{subtitle}</p>
-      <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full max-w-xs h-2 bg-gray-200 rounded-full overflow-hidden">
         <div className="h-2 bg-gradient-to-r from-pink-500 to-purple-600 animate-[loadingbar_1.4s_ease_infinite]" />
       </div>
       <style jsx>{`
@@ -243,7 +243,7 @@ export default function Page() {
     const blurred = diagnostics.slice(visible.length)
 
     return (
-      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
+      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8 sm:py-12 px-3 sm:px-6">
         <div className="mx-auto w-full max-w-6xl">
           {/* HERO */}
           <header className="mb-10 text-center">
@@ -279,7 +279,7 @@ export default function Page() {
           <section className="grid gap-4 md:grid-cols-3">
             <CardBox>
               <div className="mb-2 text-center"><Badge>Lojinha iniciante</Badge></div>
-              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+              <div className="h-40 sm:h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
                 <img src={NIVEIS.iniciante} alt="Lojinha iniciante" className="h-full w-full object-cover" />
               </div>
               <div className="mt-3 space-y-1 text-center text-sm">
@@ -290,7 +290,7 @@ export default function Page() {
 
             <CardBox extra="ring-2 ring-indigo-400 text-center">
               <div className="mb-2"><Badge>Seu nível</Badge></div>
-              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+              <div className="h-40 sm:h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
                 <img src={NIVEIS.seuNivel} alt="Seu nível" className="h-full w-full object-cover" />
               </div>
               <p className="mt-3 text-sm text-neutral-600">Pronto para descobrir seu nível e o plano de ação ideal para crescer?</p>
@@ -298,7 +298,7 @@ export default function Page() {
 
             <CardBox>
               <div className="mb-2 text-center"><Badge>Reconhecimento nacional</Badge></div>
-              <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
+              <div className="h-40 sm:h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
                 <img src={NIVEIS.nacional} alt="Fachada de loja de shopping, vitrine impecável" className="h-full w-full object-cover" />
               </div>
               <div className="mt-3 space-y-1 text-center text-sm">
@@ -458,14 +458,15 @@ export default function Page() {
           </section>
         </div>
       </div>
-    )
+    </div>
+  )
   }
 
   // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
   if (currentQuestion.type === 'loading') {
     const q = currentQuestion as Extract<Question, {type:'loading'}>
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 px-3 sm:px-4 py-6 sm:py-10">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
@@ -503,7 +504,7 @@ export default function Page() {
 
   // ---------- Formulário ----------
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 px-3 sm:px-4 py-6 sm:py-10">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
@@ -543,7 +544,7 @@ export default function Page() {
                   <button
                     key={opt}
                     onClick={() => updateFormData((currentQuestion as any).id, opt)}
-                    className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${
+                    className={`w-full p-4 text-left border rounded-xl transition-all duration-200 whitespace-normal break-words text-sm sm:text-base ${
                       (formData as any)[(currentQuestion as any).id] === opt
                         ? 'border-pink-500 bg-pink-50 text-pink-700'
                         : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
@@ -563,7 +564,7 @@ export default function Page() {
                     <button
                       key={opt}
                       onClick={() => toggleArrayValue((currentQuestion as any).id, opt)}
-                      className={`w-full p-4 text-left border rounded-xl transition-all duration-200 ${
+                      className={`w-full p-4 text-left border rounded-xl transition-all duration-200 whitespace-normal break-words text-sm sm:text-base ${
                         selected ? 'border-pink-500 bg-pink-50 text-pink-700' : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
                       }`}
                     >
@@ -579,11 +580,11 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between">
           <button
             onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
             disabled={currentStep === 0}
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+            className={`w-full sm:w-auto flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
               currentStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
             }`}
           >
@@ -597,7 +598,7 @@ export default function Page() {
               ((currentQuestion as any).type === 'select' && !(formData as any)[(currentQuestion as any).id]) ||
               ((currentQuestion as any).type === 'multiple' && ((formData as any)[(currentQuestion as any).id] as string[]).length === 0)
             }
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+            className={`w-full sm:w-auto flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
               (((currentQuestion as any).type === 'text' && !(formData as any)[(currentQuestion as any).id]) ||
                 ((currentQuestion as any).type === 'select' && !(formData as any)[(currentQuestion as any).id]) ||
                 ((currentQuestion as any).type === 'multiple' && ((formData as any)[(currentQuestion as any).id] as string[]).length === 0))
@@ -623,7 +624,7 @@ function SectionTitle({ overline, title }: { overline?: string; title: string })
   return (
     <div className="mb-6 text-center">
       {overline && <div className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600">{overline}</div>}
-      <h2 className="text-2xl md:text-4xl font-black tracking-tight text-gray-900">{title}</h2>
+      <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight text-gray-900">{title}</h2>
     </div>
   )
 }
