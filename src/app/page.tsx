@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   ChevronRight, ChevronLeft, Store, Instagram, Phone, Calendar, ShoppingBag, Users,
-  MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Globe, Mail, CheckCircle, ArrowRight, Loader2
+  MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Mail, CheckCircle, Loader2
 } from 'lucide-react'
 
 /** Versão do schema salvo no localStorage */
@@ -91,7 +91,7 @@ function AnalyzingScreen({ title, subtitle, duration, onFinish }: { title: strin
   }, [duration, onFinish])
 
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-5">
+    <div className="min-h-[40vh] flex flex-col items-center justify-center text-center space-y-5">
       <div className="relative h-28 w-28">
         <div className="absolute inset-0 rounded-full border-4 border-pink-200" />
         <div className="absolute inset-0 rounded-full border-4 border-t-pink-500 animate-spin" />
@@ -154,44 +154,32 @@ export default function Page() {
 
   // score de saúde
   const calcHealth = () => {
-  let s = 0
-  const pd = formData.presencaDigital.length
-  if (pd >= 5) s += 20
-  else if (pd >= 3) s += 14
-  else if (pd >= 1) s += 8
-
-  if (formData.frequenciaPostagens === 'Diariamente') s += 10
-  else if (formData.frequenciaPostagens === '3-4 vezes por semana') s += 8
-  else if (formData.frequenciaPostagens === '1-2 vezes por semana') s += 5
-
-  if (formData.investimentoAnuncios === 'Sim, regularmente') s += 10
-  else if (formData.investimentoAnuncios === 'Sim, esporadicamente') s += 6
-  else if (formData.investimentoAnuncios === 'Pretendo começar') s += 3
-
-  const cv = formData.canaisVenda.length
-  if (cv >= 4) s += 10
-  else if (cv >= 2) s += 6
-  else if (cv >= 1) s += 3
-
-  if (formData.contatoPosCompra && formData.contatoPosCompra !== 'Não mantenho contato regular') s += 8
-  if (formData.metasVendas && formData.metasVendas !== 'Ainda não defini') s += 8
-  if (formData.temSite && !formData.temSite.startsWith('Não')) s += 4
-
-  if (formData.vendasRedesSociais === '40% a 60%') s += 6
-  else if (['20% a 40%','60% a 80%'].includes(formData.vendasRedesSociais)) s += 4
-  else s += 2
-
-  if (formData.diferencial && formData.diferencial !== 'Ainda não tenho um diferencial claro') s += 6
-  if (formData.retencao && formData.retencao !== 'Não tenho nenhuma ação') s += 6
-  if (formData.metricas && formData.metricas !== 'Não acompanho') s += 6
-
-  const pct = Math.max(0, Math.min(100, Math.round((s / 100) * 100)))
-  const label = pct >= 75 ? 'Saudável' : pct >= 50 ? 'Atenção' : 'Crítico'
-  const color = pct >= 75 ? 'text-green-600' : pct >= 50 ? 'text-yellow-600' : 'text-red-600'
-  const bar = pct >= 75 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-  return { pct, label, color, bar }
-}
-
+    let s = 0
+    const pd = formData.presencaDigital.length
+    if (pd >= 5) s += 20; else if (pd >= 3) s += 14; else if (pd >= 1) s += 8
+    if (formData.frequenciaPostagens === 'Diariamente') s += 10
+    else if (formData.frequenciaPostagens === '3-4 vezes por semana') s += 8
+    else if (formData.frequenciaPostagens === '1-2 vezes por semana') s += 5
+    if (formData.investimentoAnuncios === 'Sim, regularmente') s += 10
+    else if (formData.investimentoAnuncios === 'Sim, esporadicamente') s += 6
+    else if (formData.investimentoAnuncios === 'Pretendo começar') s += 3
+    const cv = formData.canaisVenda.length
+    if (cv >= 4) s += 10; else if (cv >= 2) s += 6; else if (cv >= 1) s += 3
+    if (formData.contatoPosCompra && formData.contatoPosCompra !== 'Não mantenho contato regular') s += 8
+    if (formData.metasVendas && formData.metasVendas !== 'Ainda não defini') s += 8
+    if (formData.temSite && !formData.temSite.startsWith('Não')) s += 4
+    if (formData.vendasRedesSociais === '40% a 60%') s += 6
+    else if (['20% a 40%','60% a 80%'].includes(formData.vendasRedesSociais)) s += 4
+    else s += 2
+    if (formData.diferencial && formData.diferencial !== 'Ainda não tenho um diferencial claro') s += 6
+    if (formData.retencao && formData.retencao !== 'Não tenho nenhuma ação') s += 6
+    if (formData.metricas && formData.metricas !== 'Não acompanho') s += 6
+    const pct = Math.max(0, Math.min(100, Math.round((s / 100) * 100)))
+    const label = pct >= 75 ? 'Saudável' : pct >= 50 ? 'Atenção' : 'Crítico'
+    const color = pct >= 75 ? 'text-green-600' : pct >= 50 ? 'text-yellow-600' : 'text-red-600'
+    const bar = pct >= 75 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+    return { pct, label, color, bar }
+  }
 
   const generateDiagnostic = () => {
     const out: { area: string; status: string; message: string; color: string }[] = []
@@ -247,7 +235,7 @@ export default function Page() {
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // ---------- FIX 1: Priorizar o diagnóstico para evitar "loading infinito" ----------
+  // ---------- Priorizar o diagnóstico para evitar "loading infinito" ----------
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealth()
@@ -255,7 +243,7 @@ export default function Page() {
     const blurred = diagnostics.slice(visible.length)
 
     return (
-      <div className="min-h-[100svh] w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8 flex sm:block items-center justify-center">
+      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
         <div className="mx-auto w-full max-w-6xl">
           {/* HERO */}
           <header className="mb-10 text-center">
@@ -442,7 +430,7 @@ export default function Page() {
             <div className="grid gap-4 md:grid-cols-3">
               <Testimonial img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" nome="Paula" tag="VERIFICADO" texto="Finalmente parei de tentar de tudo e foquei no que funciona. Em 45 dias, bati minha melhor semana do ano." />
               <Testimonial img="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop" nome="Renata" tag="VERIFICADO" texto="As tarefas semanais me ajudaram a sair da inércia. Meus stories agora geram pedidos no mesmo dia." />
-              <Testimonial img="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=200&auto=format&fit=crop" nome="Eduardo" tag="VERIFICADO" texto="Eu não tinha estratégia. O diagnóstico mostrou o caminho e o relatório personalizado vale cada centavo." />
+              <Testimonial img="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=200&auto=format&fit=crop" nome="Larissa" tag="VERIFICADO" texto="Eu não tinha estratégia. O diagnóstico mostrou o caminho e o relatório personalizado vale cada centavo." />
             </div>
           </section>
 
@@ -473,23 +461,24 @@ export default function Page() {
     )
   }
 
-  // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
+  // ---------- Tela de "loading" com header alto e conteúdo centralizado ----------
   if (currentQuestion.type === 'loading') {
     const q = currentQuestion as Extract<Question, {type:'loading'}>
     return (
-      <div className="min-h-[100svh] bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-6 flex sm:block items-center justify-center">
-        <div className="max-w-2xl mx-auto">
+      <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-6">
+        <header className="text-center mt-4 mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
+          <p className="text-gray-600 text-sm sm:text-base">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
+        </header>
+
+        <main className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full">
           <div className="text-center mb-6">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
-            <p className="text-gray-600">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
-            <div className="mt-4">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>Etapa {currentStep + 1} de {questions.length}</span>
-                <span>{Math.round(progress)}% concluído</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-              </div>
+            <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <span>Etapa {currentStep + 1} de {questions.length}</span>
+              <span>{Math.round(progress)}% concluído</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
             </div>
           </div>
 
@@ -499,42 +488,48 @@ export default function Page() {
               subtitle={q.subtitle}
               duration={q.duration}
               onFinish={() => {
-                if (q.finalStep) {
-                  setShowDiagnostic(true)
-                } else {
-                  setCurrentStep(s => Math.min(questions.length - 1, s + 1))
-                }
+                if (q.finalStep) setShowDiagnostic(true)
+                else setCurrentStep(s => Math.min(questions.length - 1, s + 1))
               }}
             />
           </div>
-        </div>
+        </main>
       </div>
     )
   }
 
-  // ---------- Formulário ----------
+  // ---------- Formulário com header alto e card centralizado ----------
   return (
-    <div className="min-h-[100svh] bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-6 flex sm:block items-center justify-center">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
-          <p className="text-gray-600">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
-        </div>
+    <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-6">
+      {/* CABEÇALHO FIXO MAIS ALTO */}
+      <header className="text-center mt-4 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
+        <p className="text-gray-600 text-sm sm:text-base">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
+      </header>
 
-        <div className="mb-8">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+      {/* CONTEÚDO CENTRALIZADO */}
+      <main className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
+        {/* Progresso */}
+        <div className="mb-6">
+          <div className="flex justify-between text-xs sm:text-sm text-gray-600 mb-2">
             <span>Etapa {currentStep + 1} de {questions.length}</span>
-            <span>{Math.round(progress)}% concluído</span>
+            <span>{Math.round(((currentStep + 1) / questions.length) * 100)}% concluído</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div
+              className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}
+            />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
-          <div className="flex items-center mb-6">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl text-white mr-4">{(currentQuestion as any).icon}</div>
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-800">{(currentQuestion as any).title}</h2>
+        {/* CARD DO QUIZ */}
+        <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 mb-6 flex flex-col items-stretch justify-center">
+          <div className="flex items-center mb-5">
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl text-white mr-3">
+              {(currentQuestion as any).icon}
+            </div>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{(currentQuestion as any).title}</h2>
           </div>
 
           <div className="space-y-4">
@@ -544,7 +539,7 @@ export default function Page() {
                 placeholder={(currentQuestion as any).placeholder}
                 value={(formData as any)[(currentQuestion as any).id] as string}
                 onChange={(e) => updateFormData((currentQuestion as any).id, e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none text-lg"
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none text-base sm:text-lg"
               />
             )}
 
@@ -590,11 +585,12 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="flex justify-between">
+        {/* NAVEGAÇÃO */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
             disabled={currentStep === 0}
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+            className={`w-full sm:w-auto flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
               currentStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
             }`}
           >
@@ -608,7 +604,7 @@ export default function Page() {
               ((currentQuestion as any).type === 'select' && !(formData as any)[(currentQuestion as any).id]) ||
               ((currentQuestion as any).type === 'multiple' && ((formData as any)[(currentQuestion as any).id] as string[]).length === 0)
             }
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+            className={`w-full sm:w-auto flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
               (((currentQuestion as any).type === 'text' && !(formData as any)[(currentQuestion as any).id]) ||
                 ((currentQuestion as any).type === 'select' && !(formData as any)[(currentQuestion as any).id]) ||
                 ((currentQuestion as any).type === 'multiple' && ((formData as any)[(currentQuestion as any).id] as string[]).length === 0))
@@ -620,7 +616,7 @@ export default function Page() {
             <ChevronRight className="w-5 h-5 ml-2" />
           </button>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
