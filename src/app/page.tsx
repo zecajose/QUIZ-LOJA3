@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 
 /** Versão do schema salvo no localStorage */
-const FORM_VERSION = '2.0.0'
+const FORM_VERSION = '2.0.2'
 
 type QType = 'text' | 'select' | 'multiple' | 'loading'
 
@@ -235,7 +235,7 @@ export default function Page() {
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // ---------- Priorizar o diagnóstico para evitar "loading infinito" ----------
+  // ---------- DIAGNÓSTICO (priorizado para evitar “loading infinito”) ----------
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealth()
@@ -243,15 +243,13 @@ export default function Page() {
     const blurred = diagnostics.slice(visible.length)
 
     return (
-      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
+      <div className="min-h-[100svh] w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
         <div className="mx-auto w-full max-w-6xl">
-          {/* HERO */}
-          <header className="mb-10 text-center">
+          <header className="mb-8 text-center">
             <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">Desbloqueie o diagnóstico completo da sua loja</h1>
             <p className="mx-auto mt-3 max-w-3xl text-sm md:text-base text-gray-600">Veja seu nível no mercado de moda, entenda o que está travando seu crescimento e receba um caminho claro para vender mais.</p>
           </header>
 
-          {/* KPIs superiores */}
           <section className="grid gap-6 md:grid-cols-2 mb-10">
             <div className="p-5 rounded-xl border bg-gray-50">
               <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
@@ -275,7 +273,6 @@ export default function Page() {
             </div>
           </section>
 
-          {/* COMPARATIVO: Nível da Loja */}
           <section className="grid gap-4 md:grid-cols-3">
             <CardBox>
               <div className="mb-2 text-center"><Badge>Lojinha iniciante</Badge></div>
@@ -308,8 +305,7 @@ export default function Page() {
             </CardBox>
           </section>
 
-          {/* BLOCO: Amostra do diagnóstico (visível) + parte borrada */}
-          <section className="mt-10 space-y-4">
+          <section className="mt-8 space-y-4">
             {visible.map((d, i) => (
               <div key={i} className={`p-4 rounded-lg border-l-4 ${d.color}`}>
                 <div className="flex items-center justify-between mb-2">
@@ -343,8 +339,7 @@ export default function Page() {
             )}
           </section>
 
-          {/* PLANOS */}
-          <section className="mt-14">
+          <section className="mt-12">
             <SectionTitle overline="Oferta" title="Escolha seu acesso ao diagnóstico completo" />
             <div className="grid gap-5 md:grid-cols-3 items-stretch">
               <PriceCard
@@ -383,21 +378,7 @@ export default function Page() {
             </div>
           </section>
 
-          {/* BENEFÍCIOS */}
-          <section className="mt-14">
-            <SectionTitle overline="Benefícios" title="O que você recebe ao desbloquear" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <FeatureItem icon="📊" title="Diagnóstico detalhado" desc="Raio-X do seu negócio: presença digital, funil, oferta e retenção." />
-              <FeatureItem icon="🗺️" title="Plano de 90 dias" desc="Tarefas semanais e metas mensais focadas em crescimento real." />
-              <FeatureItem icon="📱" title="Análise de redes sociais" desc="Recomendações de conteúdo, calendário e formatos que convertem." />
-              <FeatureItem icon="🛍️" title="Estratégias de venda" desc="Ofertas, kits, ticket médio e campanhas sazonais (mãe, namorados, etc.)." />
-              <FeatureItem icon="🔁" title="Fidelização e recorrência" desc="Pós-venda, cupons, fluxo de WhatsApp e reativação de clientes." />
-              <FeatureItem icon="📈" title="Métricas essenciais" desc="Acompanhe CAC, ROI, taxa de recompra e conversão por canal." />
-            </div>
-          </section>
-
-          {/* RELATÓRIO BLOQUEADO */}
-          <section className="mt-14">
+          <section className="mt-12">
             <SectionTitle overline="Seu relatório" title="Relatório personalizado para a sua loja" />
             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
               <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento. Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.</p>
@@ -414,8 +395,7 @@ export default function Page() {
             </div>
           </section>
 
-          {/* RESULTADOS REAIS */}
-          <section className="mt-14">
+          <section className="mt-12">
             <SectionTitle overline="Resultados reais" title="Lojistas que destravaram o crescimento" />
             <div className="grid gap-4 md:grid-cols-3">
               <RealResultCard img="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" nome="Carla, Boutique Luma" texto="Em 30 dias, passei a postar 3x por semana com CTA e o WhatsApp virou meu melhor canal. Vendi 2x mais kits." />
@@ -424,8 +404,7 @@ export default function Page() {
             </div>
           </section>
 
-          {/* DEPOIMENTOS */}
-          <section className="mt-14">
+          <section className="mt-12">
             <SectionTitle overline="Avaliações" title="O que lojistas estão dizendo" />
             <div className="grid gap-4 md:grid-cols-3">
               <Testimonial img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" nome="Paula" tag="VERIFICADO" texto="Finalmente parei de tentar de tudo e foquei no que funciona. Em 45 dias, bati minha melhor semana do ano." />
@@ -434,19 +413,7 @@ export default function Page() {
             </div>
           </section>
 
-          {/* FAQ */}
-          <section className="mt-14">
-            <SectionTitle overline="FAQ" title="Dúvidas frequentes" />
-            <div className="grid gap-3">
-              <FAQ q="Serve para lojas pequenas?" a="Sim. Foi desenhado para quem fatura pouco e precisa de passos práticos, simples e mensuráveis." />
-              <FAQ q="Quando recebo o relatório?" a="Logo após a confirmação do pagamento, você recebe o PDF e o plano de 90 dias no e-mail/WhatsApp." />
-              <FAQ q="Preciso ter site?" a="Não. O plano cobre Instagram/WhatsApp e sugere quando faz sentido evoluir para um site ou catálogo." />
-              <FAQ q="É assinatura?" a="Não. É pagamento único, sem cobrança recorrente." />
-            </div>
-          </section>
-
-          {/* CTA Final */}
-          <section className="mt-14 text-center">
+          <section className="mt-12 text-center">
             <button
               onClick={sendFormData}
               disabled={sending}
@@ -461,27 +428,17 @@ export default function Page() {
     )
   }
 
-  // ---------- Tela de "loading" com header alto e conteúdo centralizado ----------
+  // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
   if (currentQuestion.type === 'loading') {
     const q = currentQuestion as Extract<Question, {type:'loading'}>
     return (
-      <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-6">
-        <header className="text-center mt-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
+      <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 pt-10 pb-6">
+        <header className="text-center mb-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">Diagnóstico da Sua Loja</h1>
           <p className="text-gray-600 text-sm sm:text-base">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
         </header>
 
-        <main className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full">
-          <div className="text-center mb-6">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Etapa {currentStep + 1} de {questions.length}</span>
-              <span>{Math.round(progress)}% concluído</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-            </div>
-          </div>
-
+        <main className="flex-1 flex flex-col justify-start mt-4 max-w-2xl mx-auto w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <AnalyzingScreen
               title={q.title}
@@ -498,34 +455,27 @@ export default function Page() {
     )
   }
 
-  // ---------- Formulário com header alto e card centralizado ----------
+  // ---------- Formulário ----------
   return (
-    <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 py-6">
-      {/* CABEÇALHO FIXO MAIS ALTO */}
-      <header className="text-center mt-4 mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Diagnóstico da Sua Loja</h1>
+    <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 pt-10 pb-6">
+      <header className="text-center mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">Diagnóstico da Sua Loja</h1>
         <p className="text-gray-600 text-sm sm:text-base">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
       </header>
 
-      {/* CONTEÚDO CENTRALIZADO */}
-      <main className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
-        {/* Progresso */}
-        <div className="mb-6">
+      <main className="flex-1 flex flex-col justify-start mt-3 max-w-md mx-auto w-full">
+        <div className="mb-5">
           <div className="flex justify-between text-xs sm:text-sm text-gray-600 mb-2">
             <span>Etapa {currentStep + 1} de {questions.length}</span>
-            <span>{Math.round(((currentStep + 1) / questions.length) * 100)}% concluído</span>
+            <span>{Math.round(progress)}% concluído</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}
-            />
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
         </div>
 
-        {/* CARD DO QUIZ */}
-        <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 mb-6 flex flex-col items-stretch justify-center">
-          <div className="flex items-center mb-5">
+        <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-7 mb-5 flex flex-col items-stretch justify-center">
+          <div className="flex items-center mb-4">
             <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl text-white mr-3">
               {(currentQuestion as any).icon}
             </div>
@@ -585,7 +535,6 @@ export default function Page() {
           </div>
         </div>
 
-        {/* NAVEGAÇÃO */}
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
