@@ -250,28 +250,42 @@ export default function Page() {
             <p className="mx-auto mt-3 max-w-3xl text-sm md:text-base text-gray-600">Veja seu nível no mercado de moda, entenda o que está travando seu crescimento e receba um caminho claro para vender mais.</p>
           </header>
 
-          <section className="grid gap-6 md:grid-cols-2 mb-10">
-            <div className="p-5 rounded-xl border bg-gray-50">
-              <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
-              <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
-                <span>Progresso</span><span>{completionPercent}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
-              </div>
-            </div>
+         {/* KPIs superiores + CTA para Planos */}
+<section className="grid gap-6 md:grid-cols-2 mb-6">
+  <div className="p-5 rounded-xl border bg-gray-50">
+    <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
+    <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
+      <span>Progresso</span><span>{completionPercent}%</span>
+    </div>
+    <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
+    </div>
+  </div>
 
-            <div className="p-5 rounded-xl border bg-gray-50">
-              <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
-              <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
-                <span>Status</span>
-                <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className={`h-2 rounded-full ${health.bar}`} style={{ width: `${health.pct}%` }} />
-              </div>
-            </div>
-          </section>
+  <div className="p-5 rounded-xl border bg-gray-50">
+    <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
+    <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
+      <span>Status</span>
+      <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
+    </div>
+    <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className={`h-2 rounded-full ${health.bar}`} style={{ width: `${health.pct}%` }} />
+    </div>
+  </div>
+</section>
+
+{/* CTA: leva para os Planos */}
+<div className="text-center mb-10">
+  <button
+    onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
+    className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[1px]"
+    aria-label="Ir para os planos"
+  >
+    Adquirir meu diagnóstico completo
+    <ChevronRight className="w-5 h-5 ml-2" />
+  </button>
+</div>
+
 
           <section className="grid gap-4 md:grid-cols-3">
             <CardBox>
@@ -339,7 +353,7 @@ export default function Page() {
             )}
           </section>
 
-          <section className="mt-12">
+          <section className="mt-12" id="planos">
             <SectionTitle overline="Oferta" title="Escolha seu acesso ao diagnóstico completo" />
             <div className="grid gap-5 md:grid-cols-3 items-stretch">
               <PriceCard
@@ -383,14 +397,30 @@ export default function Page() {
             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
               <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento. Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.</p>
               <div className="relative mt-4 overflow-hidden rounded-xl">
-                <div className="h-40 w-full select-none bg-gradient-to-r from-neutral-100 to-neutral-200" />
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow">
-                    <div className="text-2xl">🔒</div>
-                    <div className="font-semibold text-gray-800">Você precisa de acesso completo para ler o relatório</div>
-                  </div>
-                </div>
-              </div>
+  {/* Fundo simulado com cores e skeletons */}
+  <div className="h-48 w-full select-none bg-[radial-gradient(circle_at_20%_30%,#fce7f3,transparent_40%),radial-gradient(circle_at_80%_70%,#e9d5ff,transparent_40%),linear-gradient(to_right,#f5f5f5,#e5e7eb)]">
+    <div className="absolute inset-0 opacity-70">
+      <div className="m-4 space-y-3">
+        <div className="h-4 w-3/5 bg-white/40 rounded animate-pulse" />
+        <div className="h-4 w-4/5 bg-white/40 rounded animate-pulse" />
+        <div className="h-4 w-2/5 bg-white/40 rounded animate-pulse" />
+        <div className="h-20 w-full bg-white/30 rounded animate-pulse" />
+      </div>
+    </div>
+  </div>
+
+  {/* Camada borrada e levemente opaca para evitar "tudo branco" */}
+  <div className="absolute inset-0 backdrop-blur-sm bg-white/50" />
+
+  {/* Cartão com cadeado por cima */}
+  <div className="absolute inset-0 grid place-items-center">
+    <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow">
+      <div className="text-2xl">🔒</div>
+      <div className="font-semibold text-gray-800">Você precisa de acesso completo para ler o relatório</div>
+    </div>
+  </div>
+</div>
+
               <p className="mt-2 text-center text-[11px] text-neutral-500">Disponível imediatamente após a confirmação do pagamento.</p>
             </div>
           </section>
