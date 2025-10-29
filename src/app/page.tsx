@@ -167,7 +167,7 @@ export default function Page() {
     if (cv >= 4) s += 10; else if (cv >= 2) s += 6; else if (cv >= 1) s += 3
     if (formData.contatoPosCompra && formData.contatoPosCompra !== 'Não mantenho contato regular') s += 8
     if (formData.metasVendas && formData.metasVendas !== 'Ainda não defini') s += 8
-    if (formData.temSite e && !formData.temSite.startsWith('Não')) s += 4
+    if (formData.temSite && !formData.temSite.startsWith('Não')) s += 4
     if (formData.vendasRedesSociais === '40% a 60%') s += 6
     else if (['20% a 40%','60% a 80%'].includes(formData.vendasRedesSociais)) s += 4
     else s += 2
