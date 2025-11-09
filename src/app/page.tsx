@@ -427,7 +427,7 @@ export default function Page() {
               <PriceCard
                 ribbon="Recomendado"
                 title="Plano 3"
-                price="R$ 127,90"
+                price="R$ 137,90"
                 sub="PAGAMENTO ÚNICO"
                 bullets={[
                   'Análise da loja',
