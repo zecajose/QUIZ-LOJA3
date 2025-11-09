@@ -6,6 +6,13 @@ import {
   MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Mail, CheckCircle, Loader2
 } from 'lucide-react'
 
+declare global {
+  interface Window {
+    fbq?: (...args: any[]) => void;
+    _fbq?: any;
+  }
+}
+
 /** Versão do schema salvo no localStorage */
 const FORM_VERSION = '2.0.2'
 
@@ -130,9 +137,45 @@ export default function Page() {
       setFormData({ ...initialFormData, ...saved })
     } catch {}
   }, [])
+
   useEffect(() => {
     localStorage.setItem('fashionStoreForm', JSON.stringify({ ...formData, __version: FORM_VERSION }))
   }, [formData])
+
+  // Pixel do Facebook – PageView
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    if (window.fbq) {
+      window.fbq('track', 'PageView')
+      return
+    }
+
+    ;(function (f: any, b: any, e: any, v: any, n?: any, t?: any, s?: any) {
+      if (f.fbq) return
+      n = f.fbq = function (...args: any[]) {
+        if ((n as any).callMethod) {
+          (n as any).callMethod.apply(n, args)
+        } else {
+          ;(n as any).queue.push(args)
+        }
+      }
+      if (!f._fbq) f._fbq = n
+      ;(n as any).push = n
+      ;(n as any).loaded = true
+      ;(n as any).version = '2.0'
+      ;(n as any).queue = []
+      t = b.createElement(e)
+      t.async = true
+      t.src = v
+      s = b.getElementsByTagName(e)[0]
+      s?.parentNode?.insertBefore(t, s)
+    })(window as any, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
+
+    const PIXEL_ID = '565627859698167'
+    window.fbq?.('init', PIXEL_ID)
+    window.fbq?.('track', 'PageView')
+  }, [])
 
   const updateFormData = (field: keyof FormData, value: any) =>
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -150,6 +193,7 @@ export default function Page() {
       return acc + (v && String(v).trim() ? 1 : 0)
     }, 0)
   }, [formData])
+
   const completionPercent = Math.round((answeredCount / fieldsConfig.length) * 100)
 
   // score de saúde
@@ -744,6 +788,11 @@ function PriceCard({
           href="https://lastlink.com/p/CA4447F6C/checkout-payment"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.fbq) {
+              window.fbq('track', 'AddToCart')
+            }
+          }}
           className="mx-auto inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:translate-y-[-1px] hover:bg-indigo-700 hover:shadow-[0_7px_0_#3730a3] active:translate-y-[1px] active:shadow-[0_5px_0_#3730a3]"
         >
           Adquirir agora
