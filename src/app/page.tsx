@@ -364,7 +364,7 @@ export default function Page() {
             <div className="grid gap-5 md:grid-cols-3 items-stretch">
               <PriceCard
                 title="Plano 1"
-                price="R$ 14,90"
+                price="R$ 49,90"
                 sub="PAGAMENTO ÚNICO"
                 bullets={[
                   'Análise da sua loja',
@@ -375,7 +375,7 @@ export default function Page() {
                 ribbon="Mais vendido"
                 highlight
                 title="Plano 2"
-                price="R$ 19,90"
+                price="R$ 17,90"
                 sub="PAGAMENTO ÚNICO"
                 bullets={[
                   'Análise da sua loja',
@@ -386,7 +386,7 @@ export default function Page() {
               <PriceCard
                 ribbon="Recomendado"
                 title="Plano 3"
-                price="R$ 27,90"
+                price="R$ 127,90"
                 sub="PAGAMENTO ÚNICO"
                 bullets={[
                   'Análise da loja',
