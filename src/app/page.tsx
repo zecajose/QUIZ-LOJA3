@@ -146,7 +146,10 @@ export default function Page() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    if (window.fbq) {
+    const PIXEL_ID = '565627859698167'
+
+    // se já existe fbq, só dispara PageView
+    if (typeof window.fbq === 'function') {
       window.fbq('track', 'PageView')
       return
     }
@@ -172,9 +175,10 @@ export default function Page() {
       s?.parentNode?.insertBefore(t, s)
     })(window as any, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
 
-    const PIXEL_ID = '565627859698167'
-    window.fbq?.('init', PIXEL_ID)
-    window.fbq?.('track', 'PageView')
+    if (typeof window.fbq === 'function') {
+      window.fbq('init', PIXEL_ID)
+      window.fbq('track', 'PageView')
+    }
   }, [])
 
   const updateFormData = (field: keyof FormData, value: any) =>
@@ -789,7 +793,7 @@ function PriceCard({
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {
-            if (typeof window !== 'undefined' && window.fbq) {
+            if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
               window.fbq('track', 'AddToCart')
             }
           }}
