@@ -147,22 +147,25 @@ export default function Page() {
     if (typeof window === 'undefined') return
 
     const PIXEL_ID = '565627859698167'
+    const w = window as Window
 
-    // se já existe fbq, só dispara PageView
-    if (typeof window.fbq === 'function') {
-      window.fbq('track', 'PageView')
+    // se já existe fbq, inicializa (por segurança) e dispara PageView
+    if (typeof w.fbq === 'function') {
+      w.fbq('init', PIXEL_ID)
+      w.fbq('track', 'PageView')
       return
     }
 
     ;(function (f: any, b: any, e: any, v: any, n?: any, t?: any, s?: any) {
       if (f.fbq) return
-      n = f.fbq = function (...args: any[]) {
+      n = function (...args: any[]) {
         if ((n as any).callMethod) {
           (n as any).callMethod.apply(n, args)
         } else {
           ;(n as any).queue.push(args)
         }
       }
+      f.fbq = n
       if (!f._fbq) f._fbq = n
       ;(n as any).push = n
       ;(n as any).loaded = true
@@ -173,11 +176,11 @@ export default function Page() {
       t.src = v
       s = b.getElementsByTagName(e)[0]
       s?.parentNode?.insertBefore(t, s)
-    })(window as any, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
+    })(w as any, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
 
-    if (typeof window.fbq === 'function') {
-      window.fbq('init', PIXEL_ID)
-      window.fbq('track', 'PageView')
+    if (typeof w.fbq === 'function') {
+      w.fbq('init', PIXEL_ID)
+      w.fbq('track', 'PageView')
     }
   }, [])
 
