@@ -6,6 +6,21 @@ import {
   MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Mail, CheckCircle, Loader2
 } from 'lucide-react'
 
+type FbqFunction = ((...args: any[]) => void) & {
+  callMethod?: (...args: any[]) => void
+  queue?: any[]
+  push?: (...args: any[]) => void
+  loaded?: boolean
+  version?: string
+}
+
+declare global {
+  interface Window {
+    fbq?: FbqFunction
+    _fbq?: FbqFunction
+  }
+}
+
 /** Versão do schema salvo no localStorage */
 const FORM_VERSION = '2.0.2'
 
