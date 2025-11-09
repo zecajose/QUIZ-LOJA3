@@ -6,13 +6,6 @@ import {
   MessageCircle, DollarSign, Target, TrendingUp, Smartphone, Mail, CheckCircle, Loader2
 } from 'lucide-react'
 
-declare global {
-  interface Window {
-    fbq?: (...args: any[]) => void;
-    _fbq?: any;
-  }
-}
-
 /** Versão do schema salvo no localStorage */
 const FORM_VERSION = '2.0.2'
 
@@ -147,9 +140,9 @@ export default function Page() {
     if (typeof window === 'undefined') return
 
     const PIXEL_ID = '565627859698167'
-    const w = window as Window
+    const w = window as any
 
-    // se já existe fbq, inicializa (por segurança) e dispara PageView
+    // se já existir fbq, só usa
     if (typeof w.fbq === 'function') {
       w.fbq('init', PIXEL_ID)
       w.fbq('track', 'PageView')
@@ -176,7 +169,7 @@ export default function Page() {
       t.src = v
       s = b.getElementsByTagName(e)[0]
       s?.parentNode?.insertBefore(t, s)
-    })(w as any, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
+    })(w, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
 
     if (typeof w.fbq === 'function') {
       w.fbq('init', PIXEL_ID)
@@ -286,7 +279,7 @@ export default function Page() {
   const currentQuestion = questions[currentStep]
   const progress = ((currentStep + 1) / questions.length) * 100
 
-  // ---------- DIAGNÓSTICO (priorizado para evitar “loading infinito”) ----------
+  // ---------- DIAGNÓSTICO ----------
   if (showDiagnostic) {
     const diagnostics = generateDiagnostic()
     const health = calcHealth()
@@ -305,7 +298,6 @@ export default function Page() {
             </p>
           </header>
 
-          {/* KPIs superiores + CTA para Planos */}
           <section className="grid gap-6 md:grid-cols-2 mb-6">
             <div className="p-5 rounded-xl border bg-gray-50">
               <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
@@ -329,7 +321,6 @@ export default function Page() {
             </div>
           </section>
 
-          {/* CTA: leva para os Planos */}
           <div className="text-center mb-10">
             <button
               onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
@@ -409,7 +400,6 @@ export default function Page() {
             )}
           </section>
 
-          {/* PLANOS */}
           <section className="mt-12" id="planos">
             <SectionTitle overline="Oferta" title="Escolha seu acesso ao diagnóstico completo" />
             <div className="grid gap-5 md:grid-cols-3 items-stretch">
@@ -449,7 +439,6 @@ export default function Page() {
             </div>
           </section>
 
-          {/* RELATÓRIO BLOQUEADO */}
           <section className="mt-12">
             <SectionTitle overline="Seu relatório" title="Relatório personalizado para a sua loja" />
             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
@@ -459,7 +448,6 @@ export default function Page() {
               </p>
 
               <div className="relative mt-4 overflow-hidden rounded-xl">
-                {/* Fundo simulado com cores e skeletons */}
                 <div className="h-48 w-full select-none bg-[radial-gradient(circle_at_20%_30%,#fce7f3,transparent_40%),radial-gradient(circle_at_80%_70%,#e9d5ff,transparent_40%),linear-gradient(to_right,#f5f5f5,#e5e7eb)]">
                   <div className="absolute inset-0 opacity-70">
                     <div className="m-4 space-y-3">
@@ -471,10 +459,8 @@ export default function Page() {
                   </div>
                 </div>
 
-                {/* Camada borrada e levemente opaca */}
                 <div className="absolute inset-0 backdrop-blur-sm bg-white/50" />
 
-                {/* Cartão com cadeado por cima */}
                 <div className="absolute inset-0 grid place-items-center">
                   <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow">
                     <div className="text-2xl">🔒</div>
@@ -491,7 +477,6 @@ export default function Page() {
             </div>
           </section>
 
-          {/* RESULTADOS REAIS */}
           <section className="mt-12">
             <SectionTitle overline="Resultados reais" title="Lojistas que destravaram o crescimento" />
             <div className="grid gap-4 md:grid-cols-3">
@@ -513,7 +498,6 @@ export default function Page() {
             </div>
           </section>
 
-          {/* AVALIAÇÕES */}
           <section className="mt-12">
             <SectionTitle overline="Avaliações" title="O que lojistas estão dizendo" />
             <div className="grid gap-4 md:grid-cols-3">
@@ -538,7 +522,6 @@ export default function Page() {
             </div>
           </section>
 
-          {/* CTA Final – agora também leva para os planos */}
           <section className="mt-12 text-center">
             <button
               onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
@@ -671,9 +654,7 @@ export default function Page() {
           </div>
         </div>
 
-        {/* BOTÕES – Próxima em cima, Anterior embaixo */}
         <div className="flex flex-col gap-3 mt-1">
-          {/* Próxima */}
           <button
             onClick={() =>
               currentStep < questions.length - 1
@@ -698,7 +679,6 @@ export default function Page() {
             <ChevronRight className="w-5 h-5 ml-2" />
           </button>
 
-          {/* Anterior */}
           <button
             onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
             disabled={currentStep === 0}
@@ -796,8 +776,11 @@ function PriceCard({
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {
-            if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
-              window.fbq('track', 'AddToCart')
+            if (typeof window !== 'undefined') {
+              const w = window as any
+              if (typeof w.fbq === 'function') {
+                w.fbq('track', 'AddToCart')
+              }
             }
           }}
           className="mx-auto inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:translate-y-[-1px] hover:bg-indigo-700 hover:shadow-[0_7px_0_#3730a3] active:translate-y-[1px] active:shadow-[0_5px_0_#3730a3]"
