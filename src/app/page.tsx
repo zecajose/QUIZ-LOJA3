@@ -487,14 +487,13 @@ export default function Page() {
             </div>
           </section>
 
-          {/* CTA Final – envio dos dados para seu webhook */}
+          {/* CTA Final – agora também leva para os planos */}
           <section className="mt-12 text-center">
             <button
-              onClick={sendFormData}
-              disabled={sending}
-              className={`inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-4 text-lg font-extrabold text-white shadow-[0_8px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[2px] active:shadow-[0_6px_0_#3730a3] ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
+              onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
+              className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-4 text-lg font-extrabold text-white shadow-[0_8px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[2px] active:shadow-[0_6px_0_#3730a3]"
             >
-              {sending ? 'Enviando…' : 'Desbloquear meu diagnóstico'}
+              Desbloquear meu diagnóstico
             </button>
             <p className="mt-2 text-xs text-neutral-500">
               Pagamento único • Acesso imediato • Garantia de 7 dias
