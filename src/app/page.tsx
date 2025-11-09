@@ -246,46 +246,49 @@ export default function Page() {
       <div className="min-h-[100svh] w-full bg-gradient-to-br from-pink-50 via-white to-purple-50 py-10 px-4">
         <div className="mx-auto w-full max-w-6xl">
           <header className="mb-8 text-center">
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">Desbloqueie o diagnóstico completo da sua loja</h1>
-            <p className="mx-auto mt-3 max-w-3xl text-sm md:text-base text-gray-600">Veja seu nível no mercado de moda, entenda o que está travando seu crescimento e receba um caminho claro para vender mais.</p>
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900">
+              Desbloqueie o diagnóstico completo da sua loja
+            </h1>
+            <p className="mx-auto mt-3 max-w-3xl text-sm md:text-base text-gray-600">
+              Veja seu nível no mercado de moda, entenda o que está travando seu crescimento e receba um caminho claro para vender mais.
+            </p>
           </header>
 
-         {/* KPIs superiores + CTA para Planos */}
-<section className="grid gap-6 md:grid-cols-2 mb-6">
-  <div className="p-5 rounded-xl border bg-gray-50">
-    <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
-    <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
-      <span>Progresso</span><span>{completionPercent}%</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full h-2">
-      <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
-    </div>
-  </div>
+          {/* KPIs superiores + CTA para Planos */}
+          <section className="grid gap-6 md:grid-cols-2 mb-6">
+            <div className="p-5 rounded-xl border bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-2">% do Quiz Preenchido</h4>
+              <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
+                <span>Progresso</span><span>{completionPercent}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="h-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600" style={{ width: `${completionPercent}%` }} />
+              </div>
+            </div>
 
-  <div className="p-5 rounded-xl border bg-gray-50">
-    <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
-    <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
-      <span>Status</span>
-      <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full h-2">
-      <div className={`h-2 rounded-full ${health.bar}`} style={{ width: `${health.pct}%` }} />
-    </div>
-  </div>
-</section>
+            <div className="p-5 rounded-xl border bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-2">Saúde da Loja</h4>
+              <div className="flex items-center justify-between text-sm mb-2 text-gray-600">
+                <span>Status</span>
+                <span className={`${health.color} font-semibold`}>{health.label} • {health.pct}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className={`h-2 rounded-full ${health.bar}`} style={{ width: `${health.pct}%` }} />
+              </div>
+            </div>
+          </section>
 
-{/* CTA: leva para os Planos */}
-<div className="text-center mb-10">
-  <button
-    onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
-    className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[1px]"
-    aria-label="Ir para os planos"
-  >
-    Adquirir meu diagnóstico completo
-    <ChevronRight className="w-5 h-5 ml-2" />
-  </button>
-</div>
-
+          {/* CTA: leva para os Planos */}
+          <div className="text-center mb-10">
+            <button
+              onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
+              className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:bg-indigo-700 active:translate-y-[1px]"
+              aria-label="Ir para os planos"
+            >
+              Adquirir meu diagnóstico completo
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </button>
+          </div>
 
           <section className="grid gap-4 md:grid-cols-3">
             <CardBox>
@@ -304,7 +307,9 @@ export default function Page() {
               <div className="h-48 w-full overflow-hidden rounded-xl bg-neutral-100">
                 <img src={NIVEIS.seuNivel} alt="Seu nível" className="h-full w-full object-cover" />
               </div>
-              <p className="mt-3 text-sm text-neutral-600">Pronto para descobrir seu nível e o plano de ação ideal para crescer?</p>
+              <p className="mt-3 text-sm text-neutral-600">
+                Pronto para descobrir seu nível e o plano de ação ideal para crescer?
+              </p>
             </CardBox>
 
             <CardBox>
@@ -353,6 +358,7 @@ export default function Page() {
             )}
           </section>
 
+          {/* PLANOS */}
           <section className="mt-12" id="planos">
             <SectionTitle overline="Oferta" title="Escolha seu acesso ao diagnóstico completo" />
             <div className="grid gap-5 md:grid-cols-3 items-stretch">
@@ -392,57 +398,96 @@ export default function Page() {
             </div>
           </section>
 
+          {/* RELATÓRIO BLOQUEADO */}
           <section className="mt-12">
             <SectionTitle overline="Seu relatório" title="Relatório personalizado para a sua loja" />
             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-              <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento. Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.</p>
+              <p className="mx-auto max-w-3xl text-center text-sm text-neutral-700">
+                Seus resultados mostram dados valiosos sobre presença digital, proposta de valor e potencial de crescimento.
+                Ao desbloquear, você recebe o relatório completo com melhorias prioritárias e um roteiro claro para os próximos 90 dias.
+              </p>
+
               <div className="relative mt-4 overflow-hidden rounded-xl">
-  {/* Fundo simulado com cores e skeletons */}
-  <div className="h-48 w-full select-none bg-[radial-gradient(circle_at_20%_30%,#fce7f3,transparent_40%),radial-gradient(circle_at_80%_70%,#e9d5ff,transparent_40%),linear-gradient(to_right,#f5f5f5,#e5e7eb)]">
-    <div className="absolute inset-0 opacity-70">
-      <div className="m-4 space-y-3">
-        <div className="h-4 w-3/5 bg-white/40 rounded animate-pulse" />
-        <div className="h-4 w-4/5 bg-white/40 rounded animate-pulse" />
-        <div className="h-4 w-2/5 bg-white/40 rounded animate-pulse" />
-        <div className="h-20 w-full bg-white/30 rounded animate-pulse" />
-      </div>
-    </div>
-  </div>
+                {/* Fundo simulado com cores e skeletons */}
+                <div className="h-48 w-full select-none bg-[radial-gradient(circle_at_20%_30%,#fce7f3,transparent_40%),radial-gradient(circle_at_80%_70%,#e9d5ff,transparent_40%),linear-gradient(to_right,#f5f5f5,#e5e7eb)]">
+                  <div className="absolute inset-0 opacity-70">
+                    <div className="m-4 space-y-3">
+                      <div className="h-4 w-3/5 bg-white/40 rounded animate-pulse" />
+                      <div className="h-4 w-4/5 bg-white/40 rounded animate-pulse" />
+                      <div className="h-4 w-2/5 bg-white/40 rounded animate-pulse" />
+                      <div className="h-20 w-full bg-white/30 rounded animate-pulse" />
+                    </div>
+                  </div>
+                </div>
 
-  {/* Camada borrada e levemente opaca para evitar "tudo branco" */}
-  <div className="absolute inset-0 backdrop-blur-sm bg-white/50" />
+                {/* Camada borrada e levemente opaca */}
+                <div className="absolute inset-0 backdrop-blur-sm bg-white/50" />
 
-  {/* Cartão com cadeado por cima */}
-  <div className="absolute inset-0 grid place-items-center">
-    <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow">
-      <div className="text-2xl">🔒</div>
-      <div className="font-semibold text-gray-800">Você precisa de acesso completo para ler o relatório</div>
-    </div>
-  </div>
-</div>
+                {/* Cartão com cadeado por cima */}
+                <div className="absolute inset-0 grid place-items-center">
+                  <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow">
+                    <div className="text-2xl">🔒</div>
+                    <div className="font-semibold text-gray-800">
+                      Você precisa de acesso completo para ler o relatório
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              <p className="mt-2 text-center text-[11px] text-neutral-500">Disponível imediatamente após a confirmação do pagamento.</p>
+              <p className="mt-2 text-center text-[11px] text-neutral-500">
+                Disponível imediatamente após a confirmação do pagamento.
+              </p>
             </div>
           </section>
 
+          {/* RESULTADOS REAIS */}
           <section className="mt-12">
             <SectionTitle overline="Resultados reais" title="Lojistas que destravaram o crescimento" />
             <div className="grid gap-4 md:grid-cols-3">
-              <RealResultCard img="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" nome="Carla, Boutique Luma" texto="Em 30 dias, passei a postar 3x por semana com CTA e o WhatsApp virou meu melhor canal. Vendi 2x mais kits." />
-              <RealResultCard img="https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=800&auto=format&fit=crop" nome="Gabi, Dona G Modas" texto="Organizei ofertas por coleção e aumentei o ticket médio com combos. O plano deu clareza total." />
-              <RealResultCard img="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop" nome="Isa, Clube da Saia" texto="Fluxo de pós-compra e reativação trouxe clientes de volta. ROI dos anúncios subiu com criativo alinhado." />
+              <RealResultCard
+                img="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop"
+                nome="Carla, Boutique Luma"
+                texto="Em 30 dias, passei a postar 3x por semana com CTA e o WhatsApp virou meu melhor canal. Vendi 2x mais kits."
+              />
+              <RealResultCard
+                img="https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=800&auto=format&fit=crop"
+                nome="Gabi, Dona G Modas"
+                texto="Organizei ofertas por coleção e aumentei o ticket médio com combos. O plano deu clareza total."
+              />
+              <RealResultCard
+                img="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop"
+                nome="Isa, Clube da Saia"
+                texto="Fluxo de pós-compra e reativação trouxe clientes de volta. ROI dos anúncios subiu com criativo alinhado."
+              />
             </div>
           </section>
 
+          {/* AVALIAÇÕES */}
           <section className="mt-12">
             <SectionTitle overline="Avaliações" title="O que lojistas estão dizendo" />
             <div className="grid gap-4 md:grid-cols-3">
-              <Testimonial img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" nome="Paula" tag="VERIFICADO" texto="Finalmente parei de tentar de tudo e foquei no que funciona. Em 45 dias, bati minha melhor semana do ano." />
-              <Testimonial img="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop" nome="Renata" tag="VERIFICADO" texto="As tarefas semanais me ajudaram a sair da inércia. Meus stories agora geram pedidos no mesmo dia." />
-              <Testimonial img="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=200&auto=format&fit=crop" nome="Eduardo" tag="VERIFICADO" texto="Eu não tinha estratégia. O diagnóstico mostrou o caminho e o relatório personalizado vale cada centavo." />
+              <Testimonial
+                img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop"
+                nome="Paula"
+                tag="VERIFICADO"
+                texto="Finalmente parei de tentar de tudo e foquei no que funciona. Em 45 dias, bati minha melhor semana do ano."
+              />
+              <Testimonial
+                img="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop"
+                nome="Renata"
+                tag="VERIFICADO"
+                texto="As tarefas semanais me ajudaram a sair da inércia. Meus stories agora geram pedidos no mesmo dia."
+              />
+              <Testimonial
+                img="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=200&auto=format&fit=crop"
+                nome="Eduardo"
+                tag="VERIFICADO"
+                texto="Eu não tinha estratégia. O diagnóstico mostrou o caminho e o relatório personalizado vale cada centavo."
+              />
             </div>
           </section>
 
+          {/* CTA Final – envio dos dados para seu webhook */}
           <section className="mt-12 text-center">
             <button
               onClick={sendFormData}
@@ -451,21 +496,25 @@ export default function Page() {
             >
               {sending ? 'Enviando…' : 'Desbloquear meu diagnóstico'}
             </button>
-            <p className="mt-2 text-xs text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
+            <p className="mt-2 text-xs text-neutral-500">
+              Pagamento único • Acesso imediato • Garantia de 7 dias
+            </p>
           </section>
         </div>
       </div>
     )
   }
 
-  // ---------- Se for etapa de "loading", mostra AnalyzingScreen e não mostra navegação ----------
+  // ---------- Se for etapa de "loading", mostra AnalyzingScreen ----------
   if (currentQuestion.type === 'loading') {
     const q = currentQuestion as Extract<Question, {type:'loading'}>
     return (
       <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 pt-10 pb-6">
         <header className="text-center mb-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">Diagnóstico da Sua Loja</h1>
-          <p className="text-gray-600 text-sm sm:text-base">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Descubra como acelerar o crescimento da sua loja de moda feminina
+          </p>
         </header>
 
         <main className="flex-1 flex flex-col justify-start mt-4 max-w-2xl mx-auto w-full">
@@ -490,7 +539,9 @@ export default function Page() {
     <div className="min-h-[100svh] flex flex-col bg-gradient-to-br from-pink-50 to-purple-50 px-4 pt-10 pb-6">
       <header className="text-center mb-3">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">Diagnóstico da Sua Loja</h1>
-        <p className="text-gray-600 text-sm sm:text-base">Descubra como acelerar o crescimento da sua loja de moda feminina</p>
+        <p className="text-gray-600 text-sm sm:text-base">
+          Descubra como acelerar o crescimento da sua loja de moda feminina
+        </p>
       </header>
 
       <main className="flex-1 flex flex-col justify-start mt-3 max-w-md mx-auto w-full">
@@ -500,7 +551,10 @@ export default function Page() {
             <span>{Math.round(progress)}% concluído</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div
+              className="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
 
@@ -509,7 +563,9 @@ export default function Page() {
             <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl text-white mr-3">
               {(currentQuestion as any).icon}
             </div>
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{(currentQuestion as any).title}</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+              {(currentQuestion as any).title}
+            </h2>
           </div>
 
           <div className="space-y-4">
@@ -565,7 +621,7 @@ export default function Page() {
           </div>
         </div>
 
-               {/* BOTÕES – Próxima em cima, Anterior embaixo */}
+        {/* BOTÕES – Próxima em cima, Anterior embaixo */}
         <div className="flex flex-col gap-3 mt-1">
           {/* Próxima */}
           <button
@@ -606,7 +662,6 @@ export default function Page() {
             <ChevronLeft className="w-5 h-5 mr-2" /> Anterior
           </button>
         </div>
-
       </main>
     </div>
   )
@@ -614,55 +669,89 @@ export default function Page() {
 
 /* ===== Components auxiliares (inline) ===== */
 function Badge({ children }: { children: React.ReactNode }) {
-  return <span className="inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-black tracking-wide text-indigo-700">{children}</span>
+  return (
+    <span className="inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-black tracking-wide text-indigo-700">
+      {children}
+    </span>
+  )
 }
 
 function SectionTitle({ overline, title }: { overline?: string; title: string }) {
   return (
     <div className="mb-6 text-center">
-      {overline && <div className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600">{overline}</div>}
-      <h2 className="text-2xl md:text-4xl font-black tracking-tight text-gray-900">{title}</h2>
+      {overline && (
+        <div className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600">
+          {overline}
+        </div>
+      )}
+      <h2 className="text-2xl md:text-4xl font-black tracking-tight text-gray-900">
+        {title}
+      </h2>
     </div>
   )
 }
 
 function CardBox({ children, extra = '' }: { children: React.ReactNode; extra?: string }) {
-  return <article className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 ${extra}`}>{children}</article>
+  return (
+    <article className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 ${extra}`}>
+      {children}
+    </article>
+  )
 }
 
-function PriceCard({ title, price, sub, bullets, ribbon, highlight=false }: { title: string; price: string; sub: string; bullets: string[]; ribbon?: string; highlight?: boolean }) {
+function PriceCard({
+  title,
+  price,
+  sub,
+  bullets,
+  ribbon,
+  highlight = false
+}: {
+  title: string; price: string; sub: string; bullets: string[]; ribbon?: string; highlight?: boolean
+}) {
   return (
-    <div className={[ 'relative flex h-full flex-col rounded-2xl bg-white text-center shadow-sm ring-1 ring-black/5 transition', highlight ? 'ring-2 ring-indigo-400' : '' ].join(' ')}>
+    <div
+      className={[
+        'relative flex h-full flex-col rounded-2xl bg-white text-center shadow-sm ring-1 ring-black/5 transition',
+        highlight ? 'ring-2 ring-indigo-400' : ''
+      ].join(' ')}
+    >
       {ribbon && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-sm">{ribbon}</div>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-sm">
+          {ribbon}
+        </div>
       )}
       <div className="px-6 pt-8">
         <h3 className="text-lg font-extrabold text-gray-900">{title}</h3>
-        <div className="mt-3 text-4xl font-black leading-none text-gray-900">{price}</div>
-        <div className="mt-1 text-[12px] uppercase tracking-wide text-neutral-500">{sub}</div>
+        <div className="mt-3 text-4xl font-black leading-none text-gray-900">
+          {price}
+        </div>
+        <div className="mt-1 text-[12px] uppercase tracking-wide text-neutral-500">
+          {sub}
+        </div>
       </div>
       <div className="mx-8 mt-5 min-h-[160px] flex-1">
         <ul className="space-y-2 text-left text-sm text-neutral-700">
           {bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-2"><span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-neutral-700" /><span>{b}</span></li>
+            <li key={i} className="flex items-start gap-2">
+              <span className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-neutral-700" />
+              <span>{b}</span>
+            </li>
           ))}
         </ul>
       </div>
       <div className="px-6 pb-7 pt-4">
-        <button className="mx-auto inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:translate-y-[-1px] hover:bg-indigo-700 hover:shadow-[0_7px_0_#3730a3] active:translate-y-[1px] active:shadow-[0_5px_0_#3730a3]">Desbloquear meu diagnóstico</button>
-        <p className="mt-2 text-center text-[11px] text-neutral-500">Pagamento único • Acesso imediato • Garantia de 7 dias</p>
-      </div>
-    </div>
-  )
-}
-
-function FeatureItem({ icon, title, desc }: { icon: string; title: string; desc: string }) {
-  return (
-    <div className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
-      <div className="grid h-10 w-10 place-items-center rounded-lg bg-pink-50 text-lg">{icon}</div>
-      <div>
-        <div className="font-extrabold text-gray-900">{title}</div>
-        <div className="text-sm text-neutral-600">{desc}</div>
+        <a
+          href="https://lastlink.com/p/CA4447F6C/checkout-payment"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mx-auto inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_0_#3730a3] transition hover:translate-y-[-1px] hover:bg-indigo-700 hover:shadow-[0_7px_0_#3730a3] active:translate-y-[1px] active:shadow-[0_5px_0_#3730a3]"
+        >
+          Adquirir agora
+        </a>
+        <p className="mt-2 text-center text-[11px] text-neutral-500">
+          Pagamento único • Acesso imediato • Garantia de 7 dias
+        </p>
       </div>
     </div>
   )
@@ -686,9 +775,13 @@ function Testimonial({ img, nome, tag, texto }: { img: string; nome: string; tag
   return (
     <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
       <div className="mb-2 flex items-center gap-2 text-sm">
-        <div className="h-9 w-9 overflow-hidden rounded-full bg-neutral-200"><img src={img} alt={nome} className="h-full w-full object-cover" /></div>
+        <div className="h-9 w-9 overflow-hidden rounded-full bg-neutral-200">
+          <img src={img} alt={nome} className="h-full w-full object-cover" />
+        </div>
         <div className="font-semibold">{nome}</div>
-        <span className="ml-auto rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">{tag}</span>
+        <span className="ml-auto rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+          {tag}
+        </span>
       </div>
       <div className="text-neutral-700">{texto}</div>
     </div>
@@ -699,7 +792,9 @@ function FAQ({ q, a }: { q: string; a: string }) {
   return (
     <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-black/5">
       <details>
-        <summary className="cursor-pointer list-none text-left font-semibold text-gray-900">{q}</summary>
+        <summary className="cursor-pointer list-none text-left font-semibold text-gray-900">
+          {q}
+        </summary>
         <p className="mt-2 text-sm text-neutral-600">{a}</p>
       </details>
     </div>
